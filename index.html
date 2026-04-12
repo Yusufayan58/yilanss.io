@@ -204,6 +204,16 @@
                     <div class="skin-option pattern-option" onclick="selectPattern('zebra', this)" style="background:repeating-linear-gradient(90deg, #FFF, #FFF 5px, #000 5px, #000 10px);" title="Zebra"></div>
                     <div class="skin-option pattern-option" onclick="selectPattern('ates', this)" style="background:linear-gradient(to bottom, #FF4500, #FFD700);" title="Ateş"></div>
                     <div class="skin-option pattern-option" onclick="selectPattern('okyanus', this)" style="background:linear-gradient(to right, navy, cyan);" title="Okyanus"></div>
+                    <div class="skin-option pattern-option" onclick="selectPattern('neon', this)" style="background:linear-gradient(to right, #FF1493, #00FFFF);" title="Neon"></div>
+                    <div class="skin-option pattern-option" onclick="selectPattern('orman', this)" style="background:linear-gradient(to right, #228B22, #8B4513);" title="Orman"></div>
+                    <div class="skin-option pattern-option" onclick="selectPattern('galaksi', this)" style="background:linear-gradient(to right, #0B0C10, #8A2BE2);" title="Galaksi"></div>
+                    <div class="skin-option pattern-option" onclick="selectPattern('seker', this)" style="background:linear-gradient(to right, #FFB6C1, #87CEFA);" title="Şeker"></div>
+                    <div class="skin-option pattern-option" onclick="selectPattern('zehir', this)" style="background:repeating-linear-gradient(45deg, #800080, #800080 5px, #39FF14 5px, #39FF14 10px);" title="Zehir"></div>
+                    <div class="skin-option pattern-option" onclick="selectPattern('lav', this)" style="background:linear-gradient(to right, #8B0000, #FF4500);" title="Lav"></div>
+                    <div class="skin-option pattern-option" onclick="selectPattern('ari', this)" style="background:repeating-linear-gradient(90deg, #FFD700, #FFD700 5px, #000 5px, #000 10px);" title="Arı"></div>
+                    <div class="skin-option pattern-option" onclick="selectPattern('karpuz', this)" style="background:linear-gradient(to right, #008000, #FF0000);" title="Karpuz"></div>
+                    <div class="skin-option pattern-option" onclick="selectPattern('kamuflaj', this)" style="background:repeating-linear-gradient(45deg, #556B2F, #556B2F 8px, #8B4513 8px, #8B4513 16px);" title="Kamuflaj"></div>
+                    <div class="skin-option pattern-option" onclick="selectPattern('buzul', this)" style="background:linear-gradient(to right, #E0FFFF, #4682B4);" title="Buzul"></div>
                 </div>
             </div>
 
@@ -301,13 +311,23 @@
         const fpsInterval = 1000 / FPS;
         let lastRenderTime = performance.now();
 
-        // --- DESENLER (YENİ) ---
+        // --- DESENLER (TOPLAM 15 ADET) ---
         const bodyPatterns = {
             'gokkusagi': ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#9400D3'],
             'kaplan': ['#FF8C00', '#000000', '#FF8C00', '#FFFFFF'],
             'zebra': ['#FFFFFF', '#000000', '#FFFFFF', '#333333'],
             'ates': ['#FF4500', '#FF8C00', '#FFD700', '#FF0000'],
-            'okyanus': ['#000080', '#0000FF', '#00FFFF', '#1E90FF']
+            'okyanus': ['#000080', '#0000FF', '#00FFFF', '#1E90FF'],
+            'neon': ['#FF1493', '#00FFFF', '#FF00FF', '#00BFFF'],
+            'orman': ['#228B22', '#006400', '#8B4513', '#32CD32'],
+            'galaksi': ['#0B0C10', '#4B0082', '#8A2BE2', '#FFD700'],
+            'seker': ['#FFB6C1', '#FFFFFF', '#87CEFA', '#FF69B4'],
+            'zehir': ['#800080', '#39FF14', '#4B0082', '#00FF00'],
+            'lav': ['#8B0000', '#000000', '#FF4500', '#FF0000'],
+            'ari': ['#FFD700', '#000000', '#FFD700', '#000000'],
+            'karpuz': ['#008000', '#FF0000', '#000000', '#FF0000'],
+            'kamuflaj': ['#556B2F', '#8B4513', '#2E8B57', '#000000'],
+            'buzul': ['#FFFFFF', '#E0FFFF', '#AFEEEE', '#4682B4']
         };
         const patternKeys = Object.keys(bodyPatterns);
 
@@ -334,7 +354,7 @@
         let myId = null;
         let myName = "";
         let mySkin = null;
-        let myPattern = null; // Yeni değişken
+        let myPattern = null; 
 
         let gameState = { snakes: {}, food: [], leaderboard: [] };
         
@@ -352,7 +372,6 @@
             });
         }
 
-        // spawnSnake fonksiyonuna pattern eklendi
         function spawnSnake(id, name, isBot = false, skin = null, pattern = null) {
             gameState.snakes[id] = {
                 id: id, name: name || "İsimsiz",
@@ -422,7 +441,6 @@
                 spawnSnake(myId, myName, false, mySkin, myPattern);
                 for(let i=0; i<MAX_FOOD; i++) spawnFood();
                 
-                // Botlara %70 ihtimalle rastgele desen ver
                 for(let i=0; i<MAX_BOTS; i++) {
                     let botPattern = Math.random() > 0.3 ? patternKeys[Math.floor(Math.random() * patternKeys.length)] : null;
                     spawnSnake("bot_" + i, botNames[Math.floor(Math.random() * botNames.length)], true, null, botPattern); 
@@ -435,7 +453,6 @@
             peer.on('connection', (conn) => {
                 connections.push(conn);
                 conn.on('data', (data) => {
-                    // Bağlanan kişinin desenini de al
                     if (data.type === 'join') spawnSnake(conn.peer, data.name, false, data.skin, data.pattern);
                     if (data.type === 'input' && gameState.snakes[conn.peer]) gameState.snakes[conn.peer].angle = data.angle;
                 });
@@ -696,13 +713,11 @@
             for (let id in gameState.snakes) {
                 let snake = gameState.snakes[id];
                 
-                // Gövde Desenlerini Uygulama
                 let currentPattern = (snake.pattern && bodyPatterns[snake.pattern]) ? bodyPatterns[snake.pattern] : null;
 
                 for (let i = 0; i < snake.body.length; i+=2) { 
                     let segment = snake.body[i]; 
                     
-                    // Eğer deseni varsa sırayla renkleri değiştir, yoksa tek renk kullan
                     if(currentPattern) {
                         ctx.fillStyle = currentPattern[Math.floor(i / 2) % currentPattern.length];
                     } else {
@@ -715,7 +730,6 @@
                     ctx.fill();
                 }
 
-                // Kafa Çizimi
                 let isHeadDrawn = false;
                 if (snake.skin && skinImages[snake.skin] && skinImages[snake.skin].complete) {
                     let img = skinImages[snake.skin];
@@ -730,12 +744,10 @@
                     }
                 }
                 
-                // Resim seçilmediyse kafayı çiz (Desenin ilk rengiyle veya klasik renkle)
                 if (!isHeadDrawn) {
                     ctx.fillStyle = currentPattern ? currentPattern[0] : snake.color;
                     ctx.beginPath(); ctx.arc(snake.x, snake.y, snake.size, 0, Math.PI * 2); ctx.fill();
                     
-                    // Göz eklentisi (Kafa belli olsun diye)
                     ctx.fillStyle = "white";
                     let eyeOffsetX = Math.cos(snake.angle + Math.PI/4) * (snake.size * 0.5);
                     let eyeOffsetY = -Math.sin(snake.angle + Math.PI/4) * (snake.size * 0.5);

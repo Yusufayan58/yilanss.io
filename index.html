@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Yılanss.io</title>
+    <link rel="icon" type="image/png" href="yılanss.png">
+    <style>
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background-color: #111; overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            touch-action: none;
+        }
+        
+        #gameCanvas { display: block; }
+        
+        /* --- YENİ ANA MENÜ --- */
+        #main-menu {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #1e1e1e 0%, #000000 100%);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 100;
+        }
+        
+        #menu-logo {
+            width: 160px; height: 160px; object-fit: contain;
+            margin-bottom: 10px; border-radius: 50%;
+            box-shadow: 0 0 30px rgba(76, 175, 80, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 20px rgba(76, 175, 80, 0.2); }
+            50% { transform: scale(1.05); box-shadow: 0 0 40px rgba(76, 175, 80, 0.6); }
+            100% { transform: scale(0.95); box-shadow: 0 0 20px rgba(76, 175, 80, 0.2); }
+        }
+
+        #main-menu h1 {
+            font-size: 56px; color: #4CAF50; margin-bottom: 10px; margin-top: 0;
+            text-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+            letter-spacing: 2px;
+        }
+
+        .menu-box {
+            background: rgba(255, 255, 255, 0.1); padding: 30px;
+            border-radius: 15px; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px); width: 320px; text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .menu-btn {
+            background: #4CAF50; color: white; border: none; padding: 12px 20px;
+            margin-top: 15px; width: 100%; border-radius: 8px; font-size: 18px;
+            font-weight: bold; cursor: pointer; transition: 0.2s;
+        }
+        .menu-btn:hover { background: #45a049; transform: scale(1.05); }
+        .menu-btn.multi { background: #2196F3; }
+        .menu-btn.multi:hover { background: #1e87db; }
+        .menu-btn.skins { background: #9b59b6; }
+        .menu-btn.skins:hover { background: #8e44ad; }
+        .menu-btn.exit { background: #e74c3c; }
+        .menu-btn.exit:hover { background: #c0392b; }
+
+        input {
+            width: 100%; padding: 12px; margin-top: 15px; border: none;
+            border-radius: 8px; font-size: 16px; box-sizing: border-box;
+            background: rgba(255,255,255,0.9); text-align: center; font-weight: bold;
+        }
+
+        /* Yılan Kafası Seçim Bölümü */
+        #skins-section {
+            display: none; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 15px;
+        }
+        .skin-option {
+            width: 50px; height: 50px; border-radius: 50%; border: 3px solid transparent;
+            cursor: pointer; object-fit: cover; background: #fff; transition: 0.2s;
+            display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: bold; color: #333;
+        }
+        .skin-option:hover { transform: scale(1.1); }
+        .skin-option.selected { border-color: #4CAF50 !important; box-shadow: 0 0 15px #4CAF50; }
+
+        #multiplayer-section { display: none; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 15px; }
+        
+        #game-ui {
+            position: absolute; top: 10px; left: 10px; z-index: 10; display: none;
+            background: rgba(0,0,0,0.6); color: white; padding: 10px; border-radius: 8px; font-family: monospace;
+            min-width: 200px;
+        }
+        #status { margin-bottom: 10px; }
+        
+        #joystick-zone { position: absolute; bottom: 20px; left: 20px; width: 150px; height: 150px; z-index: 10; display: none; }
+
+        #orientation-warning {
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #e74c3c; color: white; z-index: 200;
+            text-align: center; flex-direction: column; justify-content: center; align-items: center; font-size: 24px; font-weight: bold;
+        }
+        @media screen and (orientation: portrait) { #orientation-warning { display: flex; } }
+
+        #death-screen {
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8); color: white; z-index: 50;
+            flex-direction: column; justify-content: center; align-items: center;
+        }
+        #death-screen h1 { font-size: 56px; color: #ff4757; margin-bottom: 10px; text-shadow: 0 0 20px red; }
+        .death-buttons { display: flex; gap: 10px; margin-top: 15px; }
+    </style>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.1/nipplejs.min.js"></script>
+</head>
+<body>
+
+    <div id="orientation-warning"><p>Lütfen cihazınızı yan çevirin!</p></div>
+
+    <div id="main-menu">
+        <img src="yılanss.png" alt="Yılanss.io Logo" id="menu-logo" onerror="this.style.display='none'">
+        <h1>Yılanss.io</h1>
+        <div class="menu-box">
+            <input type="text" id="playerName" placeholder="Oyuncu Adı" value="">
+            
+            <button class="menu-btn" onclick="startGame()">BAŞLA</button>
+            <button class="menu-btn skins" onclick="toggleSkins()">Yılanlar (Karakter Seç)</button>
+            <button class="menu-btn multi" onclick="toggleMultiplayer()">Çoklu Oyunculu<br><span style="font-size:12px; font-weight:normal;">(Arkadaşlarla oynamak için)</span></button>
+            
+            <div id="skins-section">
+                <p style="color:white; margin:0 0 10px 0; font-size:14px;">Yılan Kafası Seç:</p>
+                <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
+                    <div class="skin-option selected" onclick="selectSkin(null, this)" title="Klasik">Düz</div>
+                    <img src="ömer.png" class="skin-option" onclick="selectSkin('ömer', this)" alt="Ömer" title="Ömer">
+                    <img src="yusuf.png" class="skin-option" onclick="selectSkin('yusuf', this)" alt="Yusuf" title="Yusuf">
+                    <img src="enes.png" class="skin-option" onclick="selectSkin('enes', this)" alt="Enes" title="Enes">
+                </div>
+            </div>
+
+            <div id="multiplayer-section">
+                <input type="text" id="hostIdInput" placeholder="Arkadaşının ID'sini Gir">
+                <button class="menu-btn" style="background:#f39c12;" onclick="joinGame()">Odaya Katıl</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-ui">
+        <div id="status">Bağlanıyor...</div>
+        <button class="menu-btn exit" style="margin-top:5px; padding: 5px 10px; font-size: 14px;" onclick="returnToMenu()">Menüye Dön</button>
+    </div>
+
+    <div id="death-screen">
+        <h1>ÖLDÜN!</h1>
+        <div class="death-buttons">
+            <button class="menu-btn" onclick="respawn()" style="width: 150px; font-size: 20px;">Yeniden Doğ</button>
+            <button class="menu-btn exit" onclick="returnToMenu()" style="width: 150px; font-size: 20px;">Menüye Dön</button>
+        </div>
+    </div>
+
+    <div id="joystick-zone"></div>
+    <canvas id="gameCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+        canvas.width = width; canvas.height = height;
+
+        window.addEventListener('resize', () => {
+            width = window.innerWidth; height = window.innerHeight;
+            canvas.width = width; canvas.height = height;
+        });
+
+        // --- RESİMLERİ (SKİNLERİ) ÖNCEDEN YÜKLE ---
+        const skinImages = {
+            'ömer': new Image(),
+            'yusuf': new Image(),
+            'enes': new Image()
+        };
+        skinImages['ömer'].src = 'ömer.png';
+        skinImages['yusuf'].src = 'yusuf.png';
+        skinImages['enes'].src = 'enes.png';
+
+        // --- OYUN AYARLARI ---
+        const WORLD_SIZE = 4000;
+        const SNAKE_SPEED = 3.5; 
+        const MAX_BOTS = 35;  // BOTS SAYISI 35'E ÇIKARILDI!
+        const MAX_FOOD = 400;    
+
+        const FPS = 60;
+        const fpsInterval = 1000 / FPS;
+        let lastRenderTime = performance.now();
+
+        // --- JOYSTICK ---
+        let myAngle = 0; 
+        let joystickManager = null;
+
+        function initJoystick() {
+            if (joystickManager) return;
+            joystickManager = nipplejs.create({
+                zone: document.getElementById('joystick-zone'),
+                mode: 'static', position: { left: '75px', bottom: '75px' }, color: 'white'
+            });
+            joystickManager.on('move', (evt, data) => { 
+                if (data.angle) myAngle = data.angle.radian; 
+            });
+        }
+
+        // --- DEĞİŞKENLER ---
+        let peer = null;
+        let isHost = false;
+        let connections = []; 
+        let serverConn = null; 
+        let myId = null;
+        let myName = "";
+        let mySkin = null;
+
+        let gameState = { snakes: {}, food: [], leaderboard: [] };
+        
+        // Bot isimleri genişletildi
+        const botNames = ["Alpha", "Gölge", "Yokedici", "Sinsi", "Kobra", "Titan", "Ninja", "Avcı", "Rüzgar", "Hızlı", "Zehir", "Gaddar", "Şampiyon", "Hayalet", "Fırtına", "Piton", "Ejder", "Kral", "Efsane", "Viper", "Anaconda", "Mamba", "Katil", "Usta", "Patron", "Belalı", "Korkusuz", "Gece", "Karabasan"];
+
+        function randomColor() {
+            const colors = ['#FF4757', '#2ED573', '#1E90FF', '#FFA502', '#FF6348', '#7BED9F', '#70A1FF'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        function spawnFood(x, y, size, color) {
+            gameState.food.push({
+                x: x || Math.random() * WORLD_SIZE, y: y || Math.random() * WORLD_SIZE,
+                size: size || 5, color: color || randomColor()
+            });
+        }
+
+        function spawnSnake(id, name, isBot = false, skin = null) {
+            gameState.snakes[id] = {
+                id: id, name: name || "İsimsiz",
+                x: Math.random() * (WORLD_SIZE - 400) + 200,
+                y: Math.random() * (WORLD_SIZE - 400) + 200,
+                angle: Math.random() * Math.PI * 2,
+                body: [], color: randomColor(), size: 12, length: 10, isBot: isBot,
+                skin: skin 
+            };
+        }
+
+        // --- MENÜ KONTROLLERİ ---
+        function toggleMultiplayer() {
+            let sec = document.getElementById('multiplayer-section');
+            sec.style.display = sec.style.display === 'block' ? 'none' : 'block';
+            document.getElementById('skins-section').style.display = 'none';
+        }
+
+        function toggleSkins() {
+            let sec = document.getElementById('skins-section');
+            sec.style.display = sec.style.display === 'block' ? 'none' : 'block';
+            document.getElementById('multiplayer-section').style.display = 'none';
+        }
+
+        function selectSkin(skinName, element) {
+            mySkin = skinName;
+            document.querySelectorAll('.skin-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+        }
+
+        function getPlayerName() {
+            let val = document.getElementById('playerName').value;
+            return val.trim() !== "" ? val : "Oyuncu";
+        }
+
+        function showGameScreen() {
+            document.getElementById('main-menu').style.display = 'none';
+            document.getElementById('game-ui').style.display = 'block';
+            document.getElementById('joystick-zone').style.display = 'block';
+            initJoystick(); 
+        }
+
+        function returnToMenu() {
+            window.location.reload();
+        }
+
+        // --- MULTIPLAYER (PEERJS) ---
+        function startGame() {
+            myName = getPlayerName();
+            showGameScreen();
+            
+            peer = new Peer();
+            peer.on('open', (id) => {
+                myId = id;
+                isHost = true;
+                document.getElementById('status').innerHTML = "Oda ID'n: <strong style='color:#4CAF50;'>" + id + "</strong>";
+                
+                spawnSnake(myId, myName, false, mySkin);
+                for(let i=0; i<MAX_FOOD; i++) spawnFood();
+                for(let i=0; i<MAX_BOTS; i++) spawnSnake("bot_" + i, botNames[Math.floor(Math.random() * botNames.length)], true, null); 
+
+                lastRenderTime = performance.now();
+                requestAnimationFrame(hostGameLoop);
+            });
+
+            peer.on('connection', (conn) => {
+                connections.push(conn);
+                conn.on('data', (data) => {
+                    if (data.type === 'join') spawnSnake(conn.peer, data.name, false, data.skin);
+                    if (data.type === 'input' && gameState.snakes[conn.peer]) gameState.snakes[conn.peer].angle = data.angle;
+                });
+                conn.on('close', () => { delete gameState.snakes[conn.peer]; });
+            });
+        }
+
+        function joinGame() {
+            const hostId = document.getElementById('hostIdInput').value;
+            myName = getPlayerName();
+            if (!hostId) return alert("Lütfen arkadaşının ID'sini gir!");
+
+            showGameScreen();
+            peer = new Peer();
+            peer.on('open', (id) => {
+                myId = id;
+                serverConn = peer.connect(hostId);
+                
+                serverConn.on('open', () => {
+                    document.getElementById('status').innerText = "Odaya Bağlanıldı!";
+                    serverConn.send({ type: 'join', name: myName, skin: mySkin }); 
+
+                    setInterval(() => {
+                        if(document.getElementById('death-screen').style.display !== 'flex') {
+                            serverConn.send({ type: 'input', angle: myAngle });
+                        }
+                    }, 50);
+                });
+
+                serverConn.on('data', (data) => {
+                    if (data.type === 'state') {
+                        gameState = data.state;
+                        checkMyDeath();
+                        drawGame();
+                    }
+                });
+            });
+        }
+
+        function respawn() {
+            document.getElementById('death-screen').style.display = 'none';
+            if (isHost) spawnSnake(myId, myName, false, mySkin);
+            else serverConn.send({ type: 'join', name: myName, skin: mySkin });
+        }
+
+        function checkMyDeath() {
+            if (!isHost && myId && !gameState.snakes[myId]) {
+                document.getElementById('death-screen').style.display = 'flex';
+            }
+        }
+
+        // --- OYUN FİZİĞİ & RADARLI YAPAY ZEKA (SADECE HOST) ---
+        function killSnake(id) {
+            let snake = gameState.snakes[id];
+            if(!snake) return;
+
+            snake.body.forEach((segment, index) => {
+                if (index % 3 === 0) spawnFood(segment.x, segment.y, Math.min(snake.size * 0.8, 18), snake.color);
+            });
+
+            delete gameState.snakes[id];
+
+            if (id === myId) document.getElementById('death-screen').style.display = 'flex';
+            else if (snake.isBot) {
+                setTimeout(() => {
+                    let botId = "bot_" + Math.random().toString(36).substr(2, 5);
+                    spawnSnake(botId, botNames[Math.floor(Math.random() * botNames.length)], true, null);
+                }, 2000);
+            }
+        }
+
+        function hostGameLoop(currentTime) {
+            requestAnimationFrame(hostGameLoop);
+            if (!currentTime) currentTime = performance.now();
+            const deltaTime = currentTime - lastRenderTime;
+            if (deltaTime < fpsInterval) return;
+            lastRenderTime = currentTime - (deltaTime % fpsInterval);
+
+            if (gameState.snakes[myId] && document.getElementById('death-screen').style.display !== 'flex') {
+                gameState.snakes[myId].angle = myAngle;
+            }
+
+            while(gameState.food.length < MAX_FOOD) spawnFood();
+
+            let allSnakes = Object.values(gameState.snakes);
+            allSnakes.sort((a, b) => b.length - a.length);
+            gameState.leaderboard = allSnakes.slice(0, 5).map(s => ({ name: s.name, score: s.length }));
+
+            for (let id in gameState.snakes) {
+                let snake = gameState.snakes[id];
+                
+                // --- E-SPOR SEVİYESİ BOT YAPAY ZEKASI (RADAR SİSTEMİ) ---
+                if (snake.isBot) {
+                    let isDanger = false;
+                    let bestAngle = snake.angle;
+
+                    // Sensör/Radar Fonksiyonu: Belirtilen açı ve uzaklıkta tehlike var mı?
+                    function checkDanger(angleOffset, distance) {
+                        let px = snake.x + Math.cos(snake.angle + angleOffset) * distance;
+                        let py = snake.y - Math.sin(snake.angle + angleOffset) * distance;
+                        
+                        // Duvara çarpma riski
+                        if (px < 50 || px > WORLD_SIZE - 50 || py < 50 || py > WORLD_SIZE - 50) return true;
+                        
+                        // Yılan gövdelerine çarpma riski (Sen ve diğer botlar dahil)
+                        for (let otherId in gameState.snakes) {
+                            if (otherId === id) continue;
+                            let other = gameState.snakes[otherId];
+                            
+                            // Optimizasyon: Çok uzaktaki yılanları tarama
+                            if (Math.hypot(other.x - snake.x, other.y - snake.y) > 600) continue;
+
+                            for (let i = 0; i < other.body.length; i += 3) {
+                                let segment = other.body[i];
+                                if (Math.hypot(px - segment.x, py - segment.y) < snake.size + other.size + 20) {
+                                    return true;
+                                }
+                            }
+                        }
+                        return false;
+                    }
+
+                    // 5 Yönlü Radar Taraması
+                    let dangerStraight = checkDanger(0, 40) || checkDanger(0, 90) || checkDanger(0, 140);
+                    let dangerLeft = checkDanger(0.6, 70);
+                    let dangerRight = checkDanger(-0.6, 70);
+                    let dangerHardLeft = checkDanger(1.2, 50);
+                    let dangerHardRight = checkDanger(-1.2, 50);
+
+                    // 1. Hayatta Kalma (Radar tehlike algılarsa)
+                    if (dangerStraight || dangerLeft || dangerRight) {
+                        isDanger = true;
+                        // En boş alana doğru yumuşak ve akıllıca kıvrıl (Çarpışmayı engeller)
+                        if (!dangerHardLeft && (dangerRight || dangerStraight)) bestAngle += 0.2;
+                        else if (!dangerHardRight && (dangerLeft || dangerStraight)) bestAngle -= 0.2;
+                        else if (!dangerHardLeft) bestAngle += 0.25;
+                        else if (!dangerHardRight) bestAngle -= 0.25;
+                        else bestAngle += 0.3; // Tamamen sıkıştıysa sert manevra yap
+                    }
+
+                    // 2. Saldırı ve Beslenme (Tehlike yoksa)
+                    if (!isDanger) {
+                        let targetX = null;
+                        let targetY = null;
+                        
+                        let closestEnemy = null;
+                        let enemyDist = 450; // Görüş mesafesi
+
+                        for (let otherId in gameState.snakes) {
+                            if (otherId === id) continue;
+                            let other = gameState.snakes[otherId];
+                            let dist = Math.hypot(other.x - snake.x, other.y - snake.y);
+                            if (dist < enemyDist) {
+                                enemyDist = dist;
+                                closestEnemy = other;
+                            }
+                        }
+
+                        let bestFood = null;
+                        let foodScore = -1;
+                        for (let f of gameState.food) {
+                            let dist = Math.hypot(f.x - snake.x, f.y - snake.y);
+                            if (dist < 800) {
+                                let score = (f.size * f.size * f.size) / (dist + 1);
+                                if (score > foodScore) {
+                                    foodScore = score;
+                                    bestFood = f;
+                                }
+                            }
+                        }
+
+                        // Öncelik Sırası
+                        if (bestFood && bestFood.size > 10 && foodScore > 5) {
+                            // Öncelik 1: Yakında devasa ganimet var (Leş Yiyici Modu)
+                            targetX = bestFood.x;
+                            targetY = bestFood.y;
+                        } 
+                        else if (closestEnemy && enemyDist < 350) {
+                            // Öncelik 2: Yakında düşman (sen veya başka bot) var (Acımasız Avcı Modu)
+                            // Kafa kafaya çarpışmaz, DÜŞMANIN GİDECEĞİ YERİN ÖNÜNE KIRAR
+                            targetX = closestEnemy.x + Math.cos(closestEnemy.angle) * 120;
+                            targetY = closestEnemy.y - Math.sin(closestEnemy.angle) * 120;
+                        } 
+                        else if (bestFood) {
+                            // Öncelik 3: Normal yem topla
+                            targetX = bestFood.x;
+                            targetY = bestFood.y;
+                        }
+
+                        // Hedefe doğru ilerle
+                        if (targetX !== null && targetY !== null) {
+                            let angleToTarget = Math.atan2(snake.y - targetY, targetX - snake.x);
+                            let diff = angleToTarget - snake.angle;
+                            while (diff > Math.PI) diff -= Math.PI * 2;
+                            while (diff < -Math.PI) diff += Math.PI * 2;
+                            bestAngle += diff * 0.1;
+                        } else {
+                            // Yapacak iş yoksa biraz rastgele dolan
+                            if (Math.random() < 0.05) bestAngle += (Math.random() - 0.5) * 0.5;
+                        }
+                    }
+
+                    // Hesaplanan en iyi açıyı uygula
+                    snake.angle = bestAngle;
+                }
+
+                snake.body.unshift({ x: snake.x, y: snake.y });
+                if (snake.body.length > snake.length * 3) snake.body.pop();
+
+                snake.x += Math.cos(snake.angle) * SNAKE_SPEED;
+                snake.y -= Math.sin(snake.angle) * SNAKE_SPEED; 
+
+                if (snake.x < 0 || snake.x > WORLD_SIZE || snake.y < 0 || snake.y > WORLD_SIZE) {
+                    killSnake(id); continue;
+                }
+
+                let died = false;
+                for (let otherId in gameState.snakes) {
+                    if (id === otherId) continue;
+                    let other = gameState.snakes[otherId];
+                    for (let i = 0; i < other.body.length; i += 3) {
+                        let segment = other.body[i];
+                        if (Math.hypot(snake.x - segment.x, snake.y - segment.y) < snake.size + (other.size * 0.8)) {
+                            died = true; break;
+                        }
+                    }
+                    if(died) break;
+                }
+                if (died) { killSnake(id); continue; }
+
+                for (let i = gameState.food.length - 1; i >= 0; i--) {
+                    let f = gameState.food[i];
+                    if (Math.hypot(snake.x - f.x, snake.y - f.y) < snake.size + f.size) {
+                        snake.length += (f.size > 10 ? 5 : 1); 
+                        if(snake.size < 40) snake.size += (f.size > 10 ? 0.5 : 0.1); 
+                        gameState.food.splice(i, 1); 
+                    }
+                }
+            }
+
+            const statePacket = { type: 'state', state: gameState };
+            connections.forEach(conn => { if(conn.open) conn.send(statePacket); });
+            drawGame();
+        }
+
+        // --- KAMERA VE ÇİZİM ---
+        function drawGame() {
+            ctx.fillStyle = '#111'; ctx.fillRect(0, 0, width, height);
+
+            let me = gameState.snakes[myId];
+            let camX = me ? me.x - width / 2 : WORLD_SIZE / 2 - width / 2;
+            let camY = me ? me.y - height / 2 : WORLD_SIZE / 2 - height / 2;
+
+            ctx.save(); ctx.translate(-camX, -camY);
+
+            ctx.strokeStyle = '#ff4757'; ctx.lineWidth = 10;
+            ctx.strokeRect(0, 0, WORLD_SIZE, WORLD_SIZE);
+
+            ctx.strokeStyle = '#222'; ctx.lineWidth = 1;
+            let startX = Math.floor(camX / 100) * 100; let startY = Math.floor(camY / 100) * 100;
+            for(let i = startX; i < camX + width; i+=100) { ctx.beginPath(); ctx.moveTo(i, camY); ctx.lineTo(i, camY+height); ctx.stroke(); }
+            for(let i = startY; i < camY + height; i+=100) { ctx.beginPath(); ctx.moveTo(camX, i); ctx.lineTo(camX+width, i); ctx.stroke(); }
+
+            gameState.food.forEach(f => {
+                if(f.x > camX - 20 && f.x < camX + width + 20 && f.y > camY - 20 && f.y < camY + height + 20) {
+                    ctx.fillStyle = f.color; ctx.beginPath(); ctx.arc(f.x, f.y, f.size, 0, Math.PI * 2); ctx.fill();
+                    ctx.shadowBlur = 15; ctx.shadowColor = f.color;
+                }
+            });
+            ctx.shadowBlur = 0;
+
+            for (let id in gameState.snakes) {
+                let snake = gameState.snakes[id];
+                ctx.fillStyle = snake.color;
+                
+                for (let i = 0; i < snake.body.length; i+=2) { 
+                    let segment = snake.body[i]; ctx.beginPath();
+                    let radius = snake.size * (1 - (i / snake.body.length) * 0.4);
+                    ctx.arc(segment.x, segment.y, radius, 0, Math.PI * 2); ctx.fill();
+                }
+
+                let isHeadDrawn = false;
+                if (snake.skin && skinImages[snake.skin] && skinImages[snake.skin].complete) {
+                    let img = skinImages[snake.skin];
+                    if (img.naturalWidth > 0) { 
+                        ctx.save();
+                        ctx.translate(snake.x, snake.y);
+                        ctx.rotate(Math.PI / 2 - snake.angle); 
+                        let r = snake.size * 1.5;
+                        ctx.drawImage(img, -r, -r, r * 2, r * 2);
+                        ctx.restore();
+                        isHeadDrawn = true;
+                    }
+                }
+                
+                if (!isHeadDrawn) {
+                    ctx.beginPath(); ctx.arc(snake.x, snake.y, snake.size, 0, Math.PI * 2); ctx.fill();
+                }
+
+                ctx.fillStyle = "white"; ctx.font = "bold 14px Arial"; ctx.textAlign = "center";
+                let displayName = id === myId ? "Sen (" + snake.name + ")" : snake.name;
+                ctx.fillText(displayName, snake.x, snake.y - snake.size - 10);
+            }
+            ctx.restore();
+
+            if (gameState.leaderboard && gameState.leaderboard.length > 0) {
+                let lbX = width - 180; let lbY = 20;
+                ctx.fillStyle = "rgba(0, 0, 0, 0.5)"; ctx.roundRect(lbX, lbY, 160, 150, 10); ctx.fill();
+                ctx.fillStyle = "white"; ctx.font = "bold 16px Arial"; ctx.textAlign = "center";
+                ctx.fillText("Sıralama", lbX + 80, lbY + 25);
+                ctx.textAlign = "left"; ctx.font = "14px Arial";
+                gameState.leaderboard.forEach((player, index) => {
+                    let yPos = lbY + 50 + (index * 20);
+                    let color = index === 0 ? "#FFD700" : (index === 1 ? "#C0C0C0" : "#CD7F32");
+                    if(index > 2) color = "white";
+                    ctx.fillStyle = color;
+                    ctx.fillText(`${index + 1}. ${player.name}`, lbX + 10, yPos);
+                    ctx.fillText(player.score, lbX + 120, yPos);
+                });
+            }
+        }
+
+        if (!CanvasRenderingContext2D.prototype.roundRect) {
+            CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+                if (w < 2 * r) r = w / 2; if (h < 2 * r) r = h / 2;
+                this.beginPath(); this.moveTo(x + r, y); this.arcTo(x + w, y, x + w, y + h, r);
+                this.arcTo(x + w, y + h, x, y + h, r); this.arcTo(x, y + h, x, y, r);
+                this.arcTo(x, y, x + r, y, r); this.closePath(); return this;
+            }
+        }
+    </script>
+</body>
+</html>

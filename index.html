@@ -8,32 +8,26 @@
     <style>
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
-            background-color: #111; overflow: hidden;
+            background-color: #06112a;
+            overflow: hidden;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             touch-action: none;
             -webkit-user-select: none; user-select: none; 
         }
         
-        #gameCanvas { display: block; }
+        #gameCanvas { display: block; position: absolute; top:0; left:0; z-index: 1; }
 
         /* --- YÜKLEME EKRANI (LOADING) --- */
         #loading-screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            background: linear-gradient(135deg, #06112a 0%, #0a1931 100%);
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             z-index: 9999; color: white; text-align: center;
         }
-        .loading-images {
-            display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 30px;
-        }
-        .loading-images img {
-            width: 120px; height: 120px; object-fit: contain;
-            animation: pulseLoading 1.5s infinite;
-        }
+        .loading-images { display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 30px; }
+        .loading-images img { width: 120px; height: 120px; object-fit: contain; animation: pulseLoading 1.5s infinite; }
         @keyframes pulseLoading {
-            0% { transform: scale(0.9); opacity: 0.8; }
-            50% { transform: scale(1.1); opacity: 1; }
-            100% { transform: scale(0.9); opacity: 0.8; }
+            0% { transform: scale(0.9); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(0.9); opacity: 0.8; }
         }
         #loading-bar-container {
             width: 80%; max-width: 400px; height: 15px; background: rgba(255,255,255,0.1);
@@ -45,93 +39,108 @@
             transition: width 0.2s ease-out; box-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
         }
         
-        /* --- YENİ ANA MENÜ --- */
+        /* --- YENİ EFSANEVİ ANA MENÜ (Slither Tarzı) --- */
         #main-menu {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #1e1e1e 0%, #000000 100%);
-            display: none; 
-            flex-direction: column; justify-content: center; align-items: center;
-            z-index: 100;
+            background: rgba(0, 0, 0, 0.3);
+            display: none; z-index: 100; pointer-events: none; 
         }
         
-        #menu-logo {
-            width: 160px; height: 160px; object-fit: contain; margin-bottom: 10px;
-            border-radius: 50%; box-shadow: 0 0 30px rgba(76, 175, 80, 0.4);
-            animation: pulse 2s infinite; flex-shrink: 0;
+        .menu-element { pointer-events: auto; position: absolute; } 
+
+        /* 1. Sol Üst: Oyuncu İsmi */
+        #top-left-ui { top: 20px; left: 20px; display: flex; flex-direction: column; align-items: flex-start; }
+        #menu-logo-small { width: 80px; height: 80px; border-radius: 50%; box-shadow: 0 0 15px rgba(76, 175, 80, 0.5); margin-bottom: 10px; }
+        #playerName {
+            padding: 15px 20px; border: 2px solid rgba(255,255,255,0.2); border-radius: 30px;
+            background: rgba(0,0,0,0.6); color: white; font-size: 18px; font-weight: bold; width: 220px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5); outline: none; transition: 0.3s;
+        }
+        #playerName:focus { border-color: #4CAF50; background: rgba(0,0,0,0.8); }
+
+        /* Tam Ekran Butonu - Sağ Üst */
+        #fullscreen-btn {
+            top: 20px; right: 20px; background: rgba(0,0,0,0.5); color: white;
+            border: 2px solid rgba(255,255,255,0.2); padding: 10px 15px; border-radius: 20px;
+            font-weight: bold; cursor: pointer; transition: 0.2s;
+        }
+        #fullscreen-btn:hover { background: #4CAF50; border-color: #4CAF50; }
+
+        /* 2. Orta: Karakter Tasarım Bölümleri (Yan Yana) */
+        #center-ui {
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            display: flex; gap: 50px; justify-content: center; align-items: center; width: 100%;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(0.95); box-shadow: 0 0 20px rgba(76, 175, 80, 0.2); }
-            50% { transform: scale(1.05); box-shadow: 0 0 40px rgba(76, 175, 80, 0.6); }
-            100% { transform: scale(0.95); box-shadow: 0 0 20px rgba(76, 175, 80, 0.2); }
+        .design-panel {
+            background: rgba(10, 20, 40, 0.85); padding: 20px; border-radius: 20px;
+            border: 2px solid rgba(65, 105, 225, 0.5); box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            text-align: center; width: 200px; display: flex; flex-direction: column; align-items: center;
         }
-
-        #main-menu h1 {
-            font-size: 56px; color: #4CAF50; margin-bottom: 10px; margin-top: 0;
-            text-shadow: 0 0 20px rgba(76, 175, 80, 0.5); letter-spacing: 2px;
-            flex-shrink: 0;
-        }
-
-        .menu-box {
-            background: rgba(255, 255, 255, 0.1); padding: 20px 30px;
-            border-radius: 15px; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-            backdrop-filter: blur(10px); 
-            width: 90%; max-width: 340px; 
-            max-height: 55vh; 
-            overflow-y: auto; 
-            -webkit-overflow-scrolling: touch; 
-            text-align: center; border: 1px solid rgba(255,255,255,0.1);
-            box-sizing: border-box;
-        }
-
-        .menu-box::-webkit-scrollbar { width: 6px; }
-        .menu-box::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 10px; }
-        .menu-box::-webkit-scrollbar-thumb { background: #4CAF50; border-radius: 10px; }
-
-        .menu-btn {
-            background: #4CAF50; color: white; border: none; padding: 12px 20px;
-            margin-top: 10px; width: 100%; border-radius: 8px; font-size: 18px;
-            font-weight: bold; cursor: pointer; transition: 0.2s; flex-shrink: 0;
-        }
-        .menu-btn:hover { background: #45a049; transform: scale(1.02); }
-        .menu-btn.multi { background: #2196F3; }
-        .menu-btn.multi:hover { background: #1e87db; }
-        .menu-btn.skins { background: #9b59b6; }
-        .menu-btn.skins:hover { background: #8e44ad; }
-        .menu-btn.exit { background: #e74c3c; }
-        .menu-btn.exit:hover { background: #c0392b; }
-        .menu-btn.fullscreen { background: #34495e; margin-top: 5px; padding: 8px; font-size: 15px; }
-
-        input {
-            width: 100%; padding: 12px; margin-top: 10px; border: none;
-            border-radius: 8px; font-size: 16px; box-sizing: border-box;
-            background: rgba(255,255,255,0.9); text-align: center; font-weight: bold;
-        }
-
-        #skins-section { display: none; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 15px; }
+        .design-panel h3 { color: #fff; margin: 0 0 15px 0; font-size: 18px; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
         
-        .skin-option {
-            width: 45px; height: 45px; border-radius: 50%; border: 3px solid transparent;
-            cursor: pointer; object-fit: cover; background: #fff; transition: 0.2s;
-            display: flex; justify-content: center; align-items: center; font-size: 11px; font-weight: bold; color: #333;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        .carousel { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 15px; }
+        .arrow-btn {
+            background: rgba(255,255,255,0.1); border: none; color: white; font-size: 24px;
+            width: 40px; height: 40px; border-radius: 50%; cursor: pointer; transition: 0.2s;
         }
-        .skin-option:hover { transform: scale(1.1); }
-        .skin-option.selected { border-color: #4CAF50 !important; box-shadow: 0 0 15px #4CAF50; transform: scale(1.1); }
-        
-        .section-title { color:white; margin:0 0 8px 0; font-size:14px; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .arrow-btn:hover { background: #4CAF50; transform: scale(1.1); box-shadow: 0 0 10px #4CAF50; }
 
-        #multiplayer-section { display: none; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 15px; }
-        
-        #game-ui {
-            position: absolute; top: 10px; left: 10px; z-index: 10; display: none;
-            background: rgba(0,0,0,0.6); color: white; padding: 10px; border-radius: 8px; font-family: monospace;
-            min-width: 200px; pointer-events: none; 
+        /* Kıvrılan Yılan Canvasi ve Kafa Kutusu */
+        #patternPreviewCanvas { width: 100px; height: 100px; }
+        .head-preview-box {
+            width: 90px; height: 90px; border-radius: 50%; border: 3px solid #fff;
+            display: flex; justify-content: center; align-items: center; background: #333;
+            font-weight: bold; color: white; font-size: 14px; overflow: hidden; box-shadow: 0 0 20px rgba(255,255,255,0.2);
         }
+        .head-preview-box img { width: 100%; height: 100%; object-fit: cover; }
+        .selection-name { color: #2ecc71; font-weight: bold; font-size: 16px; background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 15px; }
+
+        /* 3. Sağ Alt: Başla ve Odaya Katıl Butonları */
+        #bottom-right-ui { bottom: 30px; right: 30px; display: flex; flex-direction: column; align-items: flex-end; gap: 15px; }
+        
+        .room-group { display: flex; gap: 10px; align-items: center; }
+        #hostIdInput {
+            padding: 12px 15px; border-radius: 10px; border: none; background: rgba(255,255,255,0.9);
+            font-weight: bold; width: 140px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .btn-join {
+            background: linear-gradient(135deg, #f39c12, #d35400); color: white; border: none;
+            padding: 12px 20px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;
+            box-shadow: 0 5px 15px rgba(211, 84, 0, 0.4); transition: 0.2s;
+        }
+        .btn-join:hover { transform: scale(1.05); box-shadow: 0 8px 20px rgba(211, 84, 0, 0.6); }
+
+        .btn-start {
+            background: linear-gradient(135deg, #2ecc71, #27ae60); color: white; border: none;
+            padding: 20px 50px; border-radius: 30px; font-size: 28px; font-weight: bold; cursor: pointer;
+            box-shadow: 0 8px 25px rgba(46, 204, 113, 0.5); transition: 0.2s; animation: pulseStart 2s infinite;
+        }
+        .btn-start:hover { transform: scale(1.05); background: linear-gradient(135deg, #27ae60, #1e8449); }
+        
+        @keyframes pulseStart {
+            0% { box-shadow: 0 0 15px rgba(46, 204, 113, 0.4); }
+            50% { box-shadow: 0 0 35px rgba(46, 204, 113, 0.8); }
+            100% { box-shadow: 0 0 15px rgba(46, 204, 113, 0.4); }
+        }
+
+        /* OYUN İÇİ ARAYÜZ (GAME UI) */
+        #game-ui { position: absolute; top: 10px; left: 10px; z-index: 10; display: none; background: rgba(0,0,0,0.6); color: white; padding: 10px; border-radius: 8px; font-family: monospace; min-width: 200px; pointer-events: none; }
         #game-ui button { pointer-events: auto; }
         #status { margin-bottom: 10px; }
         
-        #joystick-zone { position: absolute; bottom: 20px; left: 20px; width: 150px; height: 150px; z-index: 10; display: none; }
+        #joystick-zone { position: absolute; bottom: 20px; left: 20px; width: 130px; height: 130px; z-index: 10; display: none; }
+
+        /* HIZLANMA (BOOST) BUTONU */
+        #boost-btn {
+            position: absolute; bottom: 30px; right: 30px; width: 80px; height: 80px;
+            background: rgba(255, 71, 87, 0.6); color: white; border-radius: 50%;
+            display: none; justify-content: center; align-items: center; text-align: center;
+            font-size: 14px; font-weight: bold; border: 3px solid rgba(255,255,255,0.4);
+            z-index: 20; box-shadow: 0 0 20px rgba(255, 71, 87, 0.5); transition: 0.1s;
+            user-select: none; -webkit-user-select: none; cursor: pointer;
+        }
+        #boost-btn:active { background: rgba(255, 71, 87, 1); transform: scale(0.9); box-shadow: 0 0 30px rgba(255, 71, 87, 0.8); }
 
         #orientation-warning {
             display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -141,22 +150,30 @@
         @media screen and (orientation: portrait) { #orientation-warning { display: flex; } }
 
         /* MOBİL UYUM */
-        @media (max-width: 600px), (max-height: 600px) {
-            #menu-logo { width: 100px; height: 100px; }
-            #main-menu h1 { font-size: 32px; }
-            .menu-box { padding: 15px; max-height: 50vh; }
-            .menu-btn { padding: 10px; font-size: 15px; }
-            .skin-option { width: 40px; height: 40px; font-size: 10px; }
-            #joystick-zone { bottom: 10px; left: 10px; width: 120px; height: 120px; }
+        @media (max-width: 768px), (max-height: 600px) {
+            #menu-logo-small { width: 50px; height: 50px; }
+            #playerName { width: 150px; padding: 10px 15px; font-size: 14px; }
+            #center-ui { flex-direction: row; gap: 15px; transform: translate(-50%, -40%); }
+            .design-panel { width: 140px; padding: 10px; }
+            .design-panel h3 { font-size: 12px; margin-bottom: 5px; }
+            #patternPreviewCanvas { width: 70px; height: 70px; }
+            .head-preview-box { width: 60px; height: 60px; }
+            .selection-name { font-size: 12px; }
+            .btn-start { padding: 15px 30px; font-size: 20px; }
+            #hostIdInput { width: 90px; padding: 8px; font-size: 12px;}
+            .btn-join { padding: 8px 12px; font-size: 12px; }
+            #boost-btn { bottom: 20px; right: 20px; width: 70px; height: 70px; font-size: 12px; }
         }
 
         #death-screen {
             display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.8); color: white; z-index: 50;
-            flex-direction: column; justify-content: center; align-items: center;
+            flex-direction: column; justify-content: center; align-items: center; pointer-events: auto;
         }
         #death-screen h1 { font-size: 56px; color: #ff4757; margin-bottom: 10px; text-shadow: 0 0 20px red; }
         .death-buttons { display: flex; gap: 10px; margin-top: 15px; }
+        .menu-btn-small { background: #4CAF50; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer;}
+        .menu-btn-small.exit { background: #e74c3c; }
     </style>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.1/nipplejs.min.js"></script>
@@ -176,69 +193,66 @@
         </div>
     </div>
 
+    <canvas id="gameCanvas"></canvas>
+
     <div id="main-menu">
-        <img src="yılanss.png" alt="Yılanss.io Logo" id="menu-logo" onerror="this.style.display='none'">
-        <h1>Yılanss.io</h1>
-        <div class="menu-box">
-            <button class="menu-btn fullscreen" onclick="requestFullScreen()">🔲 Tam Ekran Yap (Genişlet)</button>
+        
+        <div id="top-left-ui" class="menu-element">
+            <img src="yılanss.png" id="menu-logo-small" alt="Logo" onerror="this.style.display='none'">
             <input type="text" id="playerName" placeholder="Oyuncu Adı" value="">
-            
-            <button class="menu-btn" onclick="startGame()">BAŞLA</button>
-            <button class="menu-btn skins" onclick="toggleSkins()">Görünüm ve Desenler</button>
-            <button class="menu-btn multi" onclick="toggleMultiplayer()">Çoklu Oyunculu<br><span style="font-size:12px; font-weight:normal;">(Arkadaşlarla oynamak için)</span></button>
-            
-            <div id="skins-section">
-                <p class="section-title">🐍 Kafa Seçimi:</p>
-                <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-bottom: 15px;">
-                    <div class="skin-option head-option selected" onclick="selectSkin(null, this)" title="Klasik">Düz</div>
-                    <img src="ömer.png" class="skin-option head-option" onclick="selectSkin('ömer', this)" alt="Ömer" title="Ömer" onerror="this.style.display='none'">
-                    <img src="yusuf.png" class="skin-option head-option" onclick="selectSkin('yusuf', this)" alt="Yusuf" title="Yusuf" onerror="this.style.display='none'">
-                    <img src="enes.png" class="skin-option head-option" onclick="selectSkin('enes', this)" alt="Enes" title="Enes" onerror="this.style.display='none'">
-                </div>
-
-                <p class="section-title">🎨 Gövde Deseni Seç:</p>
-                <div style="display:flex; justify-content:center; gap:8px; flex-wrap:wrap;">
-                    <div class="skin-option pattern-option selected" onclick="selectPattern(null, this)" style="background:#4CAF50;" title="Tek Renk">Klasik</div>
-                    <div class="skin-option pattern-option" onclick="selectPattern('gokkusagi', this)" style="background:linear-gradient(to right, red, yellow, green, blue, purple);" title="Gökkuşağı"></div>
-                    <div class="skin-option pattern-option" onclick="selectPattern('kaplan', this)" style="background:repeating-linear-gradient(45deg, #FF8C00, #FF8C00 5px, #000 5px, #000 10px);" title="Kaplan"></div>
-                    <div class="skin-option pattern-option" onclick="selectPattern('zebra', this)" style="background:repeating-linear-gradient(90deg, #FFF, #FFF 5px, #000 5px, #000 10px);" title="Zebra"></div>
-                    <div class="skin-option pattern-option" onclick="selectPattern('ates', this)" style="background:linear-gradient(to bottom, #FF4500, #FFD700);" title="Ateş"></div>
-                    <div class="skin-option pattern-option" onclick="selectPattern('okyanus', this)" style="background:linear-gradient(to right, navy, cyan);" title="Okyanus"></div>
-                    <div class="skin-option pattern-option" onclick="selectPattern('neon', this)" style="background:linear-gradient(to right, #FF1493, #00FFFF);" title="Neon"></div>
-                    <div class="skin-option pattern-option" onclick="selectPattern('orman', this)" style="background:linear-gradient(to right, #228B22, #8B4513);" title="Orman"></div>
-                    <div class="skin-option pattern-option" onclick="selectPattern('galaksi', this)" style="background:linear-gradient(to right, #0B0C10, #8A2BE2);" title="Galaksi"></div>
-                    <div class="skin-option pattern-option" onclick="selectPattern('seker', this)" style="background:linear-gradient(to right, #FFB6C1, #87CEFA);" title="Şeker"></div>
-                    <div class="skin-option pattern-option" onclick="selectPattern('zehir', this)" style="background:repeating-linear-gradient(45deg, #800080, #800080 5px, #39FF14 5px, #39FF14 10px);" title="Zehir"></div>
-                    <div class="skin-option pattern-option" onclick="selectPattern('lav', this)" style="background:linear-gradient(to right, #8B0000, #FF4500);" title="Lav"></div>
-                    <div class="skin-option pattern-option" onclick="selectPattern('ari', this)" style="background:repeating-linear-gradient(90deg, #FFD700, #FFD700 5px, #000 5px, #000 10px);" title="Arı"></div>
-                    <div class="skin-option pattern-option" onclick="selectPattern('karpuz', this)" style="background:linear-gradient(to right, #008000, #FF0000);" title="Karpuz"></div>
-                    <div class="skin-option pattern-option" onclick="selectPattern('kamuflaj', this)" style="background:repeating-linear-gradient(45deg, #556B2F, #556B2F 8px, #8B4513 8px, #8B4513 16px);" title="Kamuflaj"></div>
-                    <div class="skin-option pattern-option" onclick="selectPattern('buzul', this)" style="background:linear-gradient(to right, #E0FFFF, #4682B4);" title="Buzul"></div>
-                </div>
-            </div>
-
-            <div id="multiplayer-section">
-                <input type="text" id="hostIdInput" placeholder="Arkadaşının ID'sini Gir">
-                <button class="menu-btn" style="background:#f39c12;" onclick="joinGame()">Odaya Katıl</button>
-            </div>
         </div>
+
+        <button id="fullscreen-btn" class="menu-element" onclick="requestFullScreen()">🔲 Tam Ekran</button>
+
+        <div id="center-ui" class="menu-element">
+            
+            <div class="design-panel">
+                <h3>Gövde Deseni</h3>
+                <div class="carousel">
+                    <button class="arrow-btn" onclick="changePattern(-1)">&#10094;</button>
+                    <canvas id="patternPreviewCanvas"></canvas>
+                    <button class="arrow-btn" onclick="changePattern(1)">&#10095;</button>
+                </div>
+                <div id="pattern-name" class="selection-name">Klasik</div>
+            </div>
+
+            <div class="design-panel">
+                <h3>Kafa Seçimi</h3>
+                <div class="carousel">
+                    <button class="arrow-btn" onclick="changeHead(-1)">&#10094;</button>
+                    <div id="head-preview-box" class="head-preview-box">Düz</div>
+                    <button class="arrow-btn" onclick="changeHead(1)">&#10095;</button>
+                </div>
+                <div id="head-name" class="selection-name">Düz Seçim</div>
+            </div>
+
+        </div>
+
+        <div id="bottom-right-ui" class="menu-element">
+            <div class="room-group">
+                <input type="text" id="hostIdInput" placeholder="Oda ID Gir">
+                <button class="btn-join" onclick="joinGame()">Odaya Katıl</button>
+            </div>
+            <button class="btn-start" onclick="startGame()">BAŞLA</button>
+        </div>
+
     </div>
 
     <div id="game-ui">
         <div id="status">Bağlanıyor...</div>
-        <button class="menu-btn exit" style="margin-top:5px; padding: 5px 10px; font-size: 14px;" onclick="returnToMenu()">Menüye Dön</button>
+        <button class="menu-btn-small exit" style="margin-top:5px; padding: 5px 10px; font-size: 14px;" onclick="returnToMenu()">Menüye Dön</button>
     </div>
 
     <div id="death-screen">
         <h1>ÖLDÜN!</h1>
         <div class="death-buttons">
-            <button class="menu-btn" onclick="respawn()" style="width: 150px; font-size: 20px;">Yeniden Doğ</button>
-            <button class="menu-btn exit" onclick="returnToMenu()" style="width: 150px; font-size: 20px;">Menüye Dön</button>
+            <button class="menu-btn-small" onclick="respawn()" style="width: 150px; font-size: 20px;">Yeniden Doğ</button>
+            <button class="menu-btn-small exit" onclick="returnToMenu()" style="width: 150px; font-size: 20px;">Menüye Dön</button>
         </div>
     </div>
 
     <div id="joystick-zone"></div>
-    <canvas id="gameCanvas"></canvas>
+    <div id="boost-btn">🚀 HIZ<br><span style="font-size:10px;">(Basılı Tut)</span></div>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
@@ -254,64 +268,13 @@
 
         function requestFullScreen() {
             let el = document.documentElement;
-            if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+            if (!document.fullscreenElement) {
                 if (el.requestFullscreen) { el.requestFullscreen(); } 
-                else if (el.msRequestFullscreen) { el.msRequestFullscreen(); } 
-                else if (el.mozRequestFullScreen) { el.mozRequestFullScreen(); } 
                 else if (el.webkitRequestFullscreen) { el.webkitRequestFullscreen(); }
             }
         }
 
-        // --- OPTİMİZE EDİLMİŞ ÖN YÜKLEME (PRELOAD) SİSTEMİ ---
-        const skinImages = {};
-        const assetsToLoad = [
-            { id: 'ömer', src: 'ömer.png', type: 'skin' },
-            { id: 'yusuf', src: 'yusuf.png', type: 'skin' },
-            { id: 'enes', src: 'enes.png', type: 'skin' },
-            { id: 'logo', src: 'yılanss.png', type: 'img' },
-            { id: 'loading', src: 'Yükleme1.png', type: 'img' }
-        ];
-
-        let loadedAssets = 0;
-        
-        window.onload = () => {
-            if (assetsToLoad.length === 0) return finishLoading();
-            
-            assetsToLoad.forEach(asset => {
-                let img = new Image();
-                img.src = asset.src;
-                
-                img.onload = img.onerror = () => {
-                    loadedAssets++;
-                    let percent = Math.floor((loadedAssets / assetsToLoad.length) * 100);
-                    document.getElementById('loading-bar').style.width = percent + '%';
-                    document.getElementById('loading-text').innerText = percent + '%';
-                    
-                    if (asset.type === 'skin') skinImages[asset.id] = img;
-
-                    if (loadedAssets === assetsToLoad.length) {
-                        setTimeout(finishLoading, 600); 
-                    }
-                };
-            });
-        };
-
-        function finishLoading() {
-            document.getElementById('loading-screen').style.display = 'none';
-            document.getElementById('main-menu').style.display = 'flex';
-        }
-
-        // --- OYUN AYARLARI ---
-        const WORLD_SIZE = 4000;
-        const SNAKE_SPEED = 3.5; 
-        const MAX_BOTS = 35; 
-        const MAX_FOOD = 400;    
-
-        const FPS = 60;
-        const fpsInterval = 1000 / FPS;
-        let lastRenderTime = performance.now();
-
-        // --- DESENLER (TOPLAM 15 ADET) ---
+        // --- VERİ LİSTELERİ VE KARUSEL SİSTEMİ ---
         const bodyPatterns = {
             'gokkusagi': ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#9400D3'],
             'kaplan': ['#FF8C00', '#000000', '#FF8C00', '#FFFFFF'],
@@ -329,40 +292,145 @@
             'kamuflaj': ['#556B2F', '#8B4513', '#2E8B57', '#000000'],
             'buzul': ['#FFFFFF', '#E0FFFF', '#AFEEEE', '#4682B4']
         };
-        const patternKeys = Object.keys(bodyPatterns);
-
-        // --- JOYSTICK ---
-        let myAngle = 0; 
-        let joystickManager = null;
-
-        function initJoystick() {
-            if (joystickManager) return;
-            joystickManager = nipplejs.create({
-                zone: document.getElementById('joystick-zone'),
-                mode: 'static', position: { left: '75px', bottom: '75px' }, color: 'white'
-            });
-            joystickManager.on('move', (evt, data) => { 
-                if (data.angle) myAngle = data.angle.radian; 
-            });
-        }
-
-        // --- DEĞİŞKENLER ---
-        let peer = null;
-        let isHost = false;
-        let connections = []; 
-        let serverConn = null; 
-        let myId = null;
-        let myName = "";
-        let mySkin = null;
-        let myPattern = null; 
-
-        let gameState = { snakes: {}, food: [], leaderboard: [] };
+        const patternKeys = [null, ...Object.keys(bodyPatterns)]; // null = Klasik
+        const patternNames = ["Klasik", "Gökkuşağı", "Kaplan", "Zebra", "Ateş", "Okyanus", "Neon", "Orman", "Galaksi", "Şeker", "Zehir", "Lav", "Arı", "Karpuz", "Kamuflaj", "Buzul"];
         
-        const botNames = ["Alpha", "Gölge", "Yokedici", "Sinsi", "Kobra", "Titan", "Ninja", "Avcı", "Rüzgar", "Hızlı", "Zehir", "Gaddar", "Şampiyon", "Hayalet", "Fırtına", "Piton", "Ejder", "Kral", "Efsane", "Viper", "Anaconda", "Mamba", "Katil", "Usta", "Patron", "Belalı", "Korkusuz", "Gece", "Karabasan"];
+        const headKeys = [null, 'ömer', 'yusuf', 'enes'];
+        const headNames = ["Düz (Resimsiz)", "Ömer", "Yusuf", "Enes"];
+
+        let currentPatternIndex = 0;
+        let currentHeadIndex = 0;
+        let myPattern = null;
+        let mySkin = null;
+
+        // --- PRELOAD SİSTEMİ ---
+        const skinImages = {};
+        const assetsToLoad = [
+            { id: 'ömer', src: 'ömer.png', type: 'skin' },
+            { id: 'yusuf', src: 'yusuf.png', type: 'skin' },
+            { id: 'enes', src: 'enes.png', type: 'skin' },
+            { id: 'logo', src: 'yılanss.png', type: 'img' },
+            { id: 'loading', src: 'Yükleme1.png', type: 'img' }
+        ];
+
+        let loadedAssets = 0;
+        
+        window.onload = () => {
+            if (assetsToLoad.length === 0) return finishLoading();
+            assetsToLoad.forEach(asset => {
+                let img = new Image();
+                img.src = asset.src;
+                img.onload = img.onerror = () => {
+                    loadedAssets++;
+                    let percent = Math.floor((loadedAssets / assetsToLoad.length) * 100);
+                    document.getElementById('loading-bar').style.width = percent + '%';
+                    document.getElementById('loading-text').innerText = percent + '%';
+                    if (asset.type === 'skin') skinImages[asset.id] = img;
+                    if (loadedAssets === assetsToLoad.length) setTimeout(finishLoading, 600); 
+                };
+            });
+        };
+
+        // --- OYUN AYARLARI VE DEĞİŞKENLER ---
+        const WORLD_SIZE = 4000;
+        const SNAKE_SPEED = 3.5; 
+        const MAX_BOTS = 40; 
+        const MAX_FOOD = 500;    
+        const FPS = 60;
+        const fpsInterval = 1000 / FPS;
+        let lastRenderTime = performance.now();
+
+        let myAngle = 0; 
+        let myBoost = false; 
+        let joystickManager = null;
+        let peer = null, isHost = false, connections = [], serverConn = null, myId = null, myName = "";
+        let gameState = { snakes: {}, food: [], leaderboard: [], particles: [] };
+        const botNames = ["Alpha", "Gölge", "Yokedici", "Sinsi", "Kobra", "Titan", "Ninja", "Avcı", "Rüzgar", "Hızlı", "Zehir", "Gaddar", "Şampiyon", "Hayalet", "Fırtına", "Piton"];
+
+        let inMenuMode = true; 
+        let menuCamX = WORLD_SIZE / 2;
+        let menuCamY = WORLD_SIZE / 2;
+        let menuCamAngle = 0;
 
         function randomColor() {
             const colors = ['#FF4757', '#2ED573', '#1E90FF', '#FFA502', '#FF6348', '#7BED9F', '#70A1FF'];
             return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        // --- KARUSEL FONKSİYONLARI VE CANLI ANİMASYON ---
+        function updateMenus() {
+            myPattern = patternKeys[currentPatternIndex];
+            mySkin = headKeys[currentHeadIndex];
+            
+            document.getElementById('pattern-name').innerText = patternNames[currentPatternIndex];
+            document.getElementById('head-name').innerText = headNames[currentHeadIndex];
+
+            // Kafa Kutusunu Güncelle
+            let headBox = document.getElementById('head-preview-box');
+            if(mySkin && skinImages[mySkin] && skinImages[mySkin].complete) {
+                headBox.innerHTML = `<img src="${skinImages[mySkin].src}">`;
+            } else {
+                headBox.innerHTML = "Düz";
+            }
+        }
+
+        function changePattern(dir) {
+            currentPatternIndex += dir;
+            if(currentPatternIndex >= patternKeys.length) currentPatternIndex = 0;
+            if(currentPatternIndex < 0) currentPatternIndex = patternKeys.length - 1;
+            updateMenus();
+        }
+
+        function changeHead(dir) {
+            currentHeadIndex += dir;
+            if(currentHeadIndex >= headKeys.length) currentHeadIndex = 0;
+            if(currentHeadIndex < 0) currentHeadIndex = headKeys.length - 1;
+            updateMenus();
+        }
+
+        let previewTime = 0;
+        function animatePatternPreview() {
+            if(!inMenuMode) return;
+            const pCanvas = document.getElementById('patternPreviewCanvas');
+            pCanvas.width = 100; pCanvas.height = 100;
+            const pCtx = pCanvas.getContext('2d');
+            pCtx.clearRect(0,0, 100, 100);
+
+            previewTime += 0.1;
+            let currentP = myPattern ? bodyPatterns[myPattern] : null;
+            
+            let segments = [];
+            for(let i=0; i<12; i++) {
+                let x = 50 + Math.sin(previewTime - i * 0.4) * 20; 
+                let y = 15 + i * 6; 
+                segments.push({x, y});
+            }
+
+            for(let i=segments.length-1; i>=0; i--) {
+                if(currentP) pCtx.fillStyle = currentP[Math.floor(i / 2) % currentP.length];
+                else pCtx.fillStyle = '#4CAF50';
+                
+                pCtx.beginPath();
+                let radius = 10 * (1 - (i / 15) * 0.4);
+                pCtx.arc(segments[i].x, segments[i].y, radius, 0, Math.PI*2);
+                pCtx.fill();
+            }
+            requestAnimationFrame(animatePatternPreview);
+        }
+
+        // DÜZELTİLEN SPAWN FONKSİYONU: isMenuBot parametresi eklendi
+        function spawnSnake(id, name, isBot = false, skin = null, pattern = null, isMenuBot = false) {
+            // Menüdeyken yılanları merkeze (kameranın göreceği yere) topla. Oyundayken haritanın her yerine dağıt.
+            let startX = isMenuBot ? WORLD_SIZE/2 + (Math.random()-0.5)*1500 : Math.random() * (WORLD_SIZE - 400) + 200;
+            let startY = isMenuBot ? WORLD_SIZE/2 + (Math.random()-0.5)*1500 : Math.random() * (WORLD_SIZE - 400) + 200;
+
+            gameState.snakes[id] = {
+                id: id, name: name || "İsimsiz", 
+                x: startX, y: startY,
+                angle: Math.random() * Math.PI * 2, 
+                body: [], color: randomColor(), size: 12, length: 15, isBot: isBot, 
+                skin: skin, pattern: pattern, isBoosting: false
+            };
         }
 
         function spawnFood(x, y, size, color) {
@@ -372,42 +440,66 @@
             });
         }
 
-        function spawnSnake(id, name, isBot = false, skin = null, pattern = null) {
-            gameState.snakes[id] = {
-                id: id, name: name || "İsimsiz",
-                x: Math.random() * (WORLD_SIZE - 400) + 200,
-                y: Math.random() * (WORLD_SIZE - 400) + 200,
-                angle: Math.random() * Math.PI * 2,
-                body: [], color: randomColor(), size: 12, length: 10, isBot: isBot,
-                skin: skin,
-                pattern: pattern
-            };
+        function finishLoading() {
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('main-menu').style.display = 'flex';
+            
+            updateMenus();
+            animatePatternPreview();
+
+            // MENÜ ARKA PLANI İÇİN BOTLARI YARAT (Sadece Menü İçin)
+            for(let i=0; i<MAX_FOOD; i++) spawnFood();
+            for(let i=0; i<30; i++) {
+                let p = Math.random() > 0.2 ? patternKeys[Math.floor(Math.random() * patternKeys.length)] : null;
+                // 'true' parametresi sayesinde menü botları kameranın göreceği yere doğar
+                spawnSnake("menuBot_" + i, botNames[Math.floor(Math.random() * botNames.length)], true, null, p, true);
+            }
+            requestAnimationFrame(menuBackgroundLoop);
         }
 
-        // --- MENÜ KONTROLLERİ ---
-        function toggleMultiplayer() {
-            let sec = document.getElementById('multiplayer-section');
-            sec.style.display = sec.style.display === 'block' ? 'none' : 'block';
-            document.getElementById('skins-section').style.display = 'none';
+        // --- CANLI ARKA PLAN DÖNGÜSÜ ---
+        function menuBackgroundLoop() {
+            if(!inMenuMode) return;
+            requestAnimationFrame(menuBackgroundLoop);
+            
+            menuCamAngle += 0.002;
+            menuCamX = WORLD_SIZE/2 + Math.cos(menuCamAngle) * 800;
+            menuCamY = WORLD_SIZE/2 + Math.sin(menuCamAngle) * 800;
+
+            for (let id in gameState.snakes) {
+                let s = gameState.snakes[id];
+                if(Math.random() < 0.05) s.angle += (Math.random() - 0.5) * 0.5;
+                s.body.unshift({ x: s.x, y: s.y });
+                if (s.body.length > s.length * 3) s.body.pop();
+                s.x += Math.cos(s.angle) * SNAKE_SPEED;
+                s.y -= Math.sin(s.angle) * SNAKE_SPEED;
+                
+                if(s.x < 100) { s.x = 100; s.angle = 0; }
+                if(s.x > WORLD_SIZE-100) { s.x = WORLD_SIZE-100; s.angle = Math.PI; }
+                if(s.y < 100) { s.y = 100; s.angle = Math.PI/2; }
+                if(s.y > WORLD_SIZE-100) { s.y = WORLD_SIZE-100; s.angle = -Math.PI/2; }
+            }
+            drawGame(menuCamX, menuCamY, false);
         }
 
-        function toggleSkins() {
-            let sec = document.getElementById('skins-section');
-            sec.style.display = sec.style.display === 'block' ? 'none' : 'block';
-            document.getElementById('multiplayer-section').style.display = 'none';
+        // --- OYUN KONTROLLERİ ---
+        function initJoystick() {
+            if (joystickManager) return;
+            joystickManager = nipplejs.create({
+                zone: document.getElementById('joystick-zone'),
+                mode: 'static', position: { left: '75px', bottom: '75px' }, color: 'white'
+            });
+            joystickManager.on('move', (evt, data) => { if (data.angle) myAngle = data.angle.radian; });
         }
 
-        function selectSkin(skinName, element) {
-            mySkin = skinName;
-            document.querySelectorAll('.head-option').forEach(el => el.classList.remove('selected'));
-            element.classList.add('selected');
-        }
-
-        function selectPattern(patternName, element) {
-            myPattern = patternName;
-            document.querySelectorAll('.pattern-option').forEach(el => el.classList.remove('selected'));
-            element.classList.add('selected');
-        }
+        window.addEventListener('keydown', (e) => { if(e.code === 'Space') myBoost = true; });
+        window.addEventListener('keyup', (e) => { if(e.code === 'Space') myBoost = false; });
+        window.addEventListener('mousedown', (e) => { if(e.target.id !== 'joystick-zone' && e.target.className !== 'front') myBoost = true; });
+        window.addEventListener('mouseup', () => { myBoost = false; });
+        
+        let boostBtn = document.getElementById('boost-btn');
+        boostBtn.addEventListener('touchstart', (e) => { e.preventDefault(); myBoost = true; }, {passive: false});
+        boostBtn.addEventListener('touchend', (e) => { e.preventDefault(); myBoost = false; });
 
         function getPlayerName() {
             let val = document.getElementById('playerName').value;
@@ -415,35 +507,38 @@
         }
 
         function showGameScreen() {
+            inMenuMode = false; 
             document.getElementById('main-menu').style.display = 'none';
             document.getElementById('game-ui').style.display = 'block';
             document.getElementById('joystick-zone').style.display = 'block';
-            
+            document.getElementById('boost-btn').style.display = 'flex'; 
             requestFullScreen();
             initJoystick(); 
         }
 
-        function returnToMenu() {
-            window.location.reload();
-        }
+        function returnToMenu() { window.location.reload(); }
 
-        // --- MULTIPLAYER (PEERJS) ---
+        // --- OYUNU BAŞLATMA ---
         function startGame() {
             myName = getPlayerName();
             showGameScreen();
             
+            // Menüdeki dar alanda doğan sahte yılanları tamamen sil!
+            gameState.snakes = {};
+            
             peer = new Peer();
             peer.on('open', (id) => {
-                myId = id;
-                isHost = true;
-                document.getElementById('status').innerHTML = "Oda ID'n: <strong style='color:#4CAF50;'>" + id + "</strong>";
+                myId = id; isHost = true;
+                document.getElementById('status').innerHTML = "Oda ID: <strong style='color:#4CAF50;'>" + id + "</strong>";
                 
-                spawnSnake(myId, myName, false, mySkin, myPattern);
+                // Oyuncuyu rastgele geniş alana doğur ('false' parametresi)
+                spawnSnake(myId, myName, false, mySkin, myPattern, false);
                 for(let i=0; i<MAX_FOOD; i++) spawnFood();
                 
+                // Botları rastgele geniş alana doğur ('false' parametresi)
                 for(let i=0; i<MAX_BOTS; i++) {
                     let botPattern = Math.random() > 0.3 ? patternKeys[Math.floor(Math.random() * patternKeys.length)] : null;
-                    spawnSnake("bot_" + i, botNames[Math.floor(Math.random() * botNames.length)], true, null, botPattern); 
+                    spawnSnake("bot_" + i, botNames[Math.floor(Math.random() * botNames.length)], true, null, botPattern, false); 
                 }
 
                 lastRenderTime = performance.now();
@@ -453,8 +548,11 @@
             peer.on('connection', (conn) => {
                 connections.push(conn);
                 conn.on('data', (data) => {
-                    if (data.type === 'join') spawnSnake(conn.peer, data.name, false, data.skin, data.pattern);
-                    if (data.type === 'input' && gameState.snakes[conn.peer]) gameState.snakes[conn.peer].angle = data.angle;
+                    if (data.type === 'join') spawnSnake(conn.peer, data.name, false, data.skin, data.pattern, false);
+                    if (data.type === 'input' && gameState.snakes[conn.peer]) {
+                        gameState.snakes[conn.peer].angle = data.angle;
+                        gameState.snakes[conn.peer].isBoosting = data.boost;
+                    }
                 });
                 conn.on('close', () => { delete gameState.snakes[conn.peer]; });
             });
@@ -466,27 +564,29 @@
             if (!hostId) return alert("Lütfen arkadaşının ID'sini gir!");
 
             showGameScreen();
+            gameState.snakes = {}; // Menü botlarını temizle
+            
             peer = new Peer();
             peer.on('open', (id) => {
                 myId = id;
                 serverConn = peer.connect(hostId);
-                
                 serverConn.on('open', () => {
                     document.getElementById('status').innerText = "Odaya Bağlanıldı!";
                     serverConn.send({ type: 'join', name: myName, skin: mySkin, pattern: myPattern }); 
 
                     setInterval(() => {
                         if(document.getElementById('death-screen').style.display !== 'flex') {
-                            serverConn.send({ type: 'input', angle: myAngle });
+                            serverConn.send({ type: 'input', angle: myAngle, boost: myBoost });
                         }
                     }, 50);
                 });
 
                 serverConn.on('data', (data) => {
                     if (data.type === 'state') {
-                        gameState = data.state;
-                        checkMyDeath();
-                        drawGame();
+                        gameState = data.state; checkMyDeath(); 
+                        let me = gameState.snakes[myId];
+                        let cx = me ? me.x : WORLD_SIZE/2; let cy = me ? me.y : WORLD_SIZE/2;
+                        drawGame(cx, cy, true);
                     }
                 });
             });
@@ -494,17 +594,14 @@
 
         function respawn() {
             document.getElementById('death-screen').style.display = 'none';
-            if (isHost) spawnSnake(myId, myName, false, mySkin, myPattern);
+            if (isHost) spawnSnake(myId, myName, false, mySkin, myPattern, false);
             else serverConn.send({ type: 'join', name: myName, skin: mySkin, pattern: myPattern });
         }
 
         function checkMyDeath() {
-            if (!isHost && myId && !gameState.snakes[myId]) {
-                document.getElementById('death-screen').style.display = 'flex';
-            }
+            if (!isHost && myId && !gameState.snakes[myId]) document.getElementById('death-screen').style.display = 'flex';
         }
 
-        // --- OYUN FİZİĞİ & RADARLI YAPAY ZEKA ---
         function killSnake(id) {
             let snake = gameState.snakes[id];
             if(!snake) return;
@@ -513,19 +610,31 @@
                 if (index % 3 === 0) spawnFood(segment.x, segment.y, Math.min(snake.size * 0.8, 18), snake.color);
             });
 
+            if(!gameState.particles) gameState.particles = [];
+            gameState.particles.push({ type: 'text', text: snake.name + " Patladı!", x: snake.x, y: snake.y, vx: 0, vy: -1.5, life: 2.0, color: '#ff4757' });
+
+            for(let i=0; i<30; i++) {
+                gameState.particles.push({
+                    type: 'dot', x: snake.x, y: snake.y, vx: (Math.random() - 0.5) * 15, vy: (Math.random() - 0.5) * 15,
+                    life: 1.0 + Math.random(), color: snake.color, size: Math.random() * 6 + 3
+                });
+            }
+
             delete gameState.snakes[id];
 
             if (id === myId) document.getElementById('death-screen').style.display = 'flex';
-            else if (snake.isBot) {
+            else if (snake.isBot && !inMenuMode) {
                 setTimeout(() => {
                     let botId = "bot_" + Math.random().toString(36).substr(2, 5);
                     let botPattern = Math.random() > 0.3 ? patternKeys[Math.floor(Math.random() * patternKeys.length)] : null;
-                    spawnSnake(botId, botNames[Math.floor(Math.random() * botNames.length)], true, null, botPattern);
+                    // Ölen bot yerine yeni doğan bot da rastgele uzak köşede doğsun
+                    spawnSnake(botId, botNames[Math.floor(Math.random() * botNames.length)], true, null, botPattern, false);
                 }, 2000);
             }
         }
 
         function hostGameLoop(currentTime) {
+            if(inMenuMode) return;
             requestAnimationFrame(hostGameLoop);
             if (!currentTime) currentTime = performance.now();
             const deltaTime = currentTime - lastRenderTime;
@@ -534,13 +643,21 @@
 
             if (gameState.snakes[myId] && document.getElementById('death-screen').style.display !== 'flex') {
                 gameState.snakes[myId].angle = myAngle;
+                gameState.snakes[myId].isBoosting = myBoost; 
             }
 
             while(gameState.food.length < MAX_FOOD) spawnFood();
 
+            if(gameState.particles) {
+                for (let i = gameState.particles.length - 1; i >= 0; i--) {
+                    let p = gameState.particles[i]; p.x += p.vx; p.y += p.vy; p.life -= 0.02; 
+                    if (p.life <= 0) gameState.particles.splice(i, 1);
+                }
+            }
+
             let allSnakes = Object.values(gameState.snakes);
             allSnakes.sort((a, b) => b.length - a.length);
-            gameState.leaderboard = allSnakes.slice(0, 5).map(s => ({ name: s.name, score: s.length }));
+            gameState.leaderboard = allSnakes.slice(0, 5).map(s => ({ name: s.name, score: Math.floor(s.length) }));
 
             for (let id in gameState.snakes) {
                 let snake = gameState.snakes[id];
@@ -552,20 +669,14 @@
                     function checkDanger(angleOffset, distance) {
                         let px = snake.x + Math.cos(snake.angle + angleOffset) * distance;
                         let py = snake.y - Math.sin(snake.angle + angleOffset) * distance;
-                        
                         if (px < 50 || px > WORLD_SIZE - 50 || py < 50 || py > WORLD_SIZE - 50) return true;
-                        
                         for (let otherId in gameState.snakes) {
                             if (otherId === id) continue;
                             let other = gameState.snakes[otherId];
-                            
                             if (Math.hypot(other.x - snake.x, other.y - snake.y) > 600) continue;
-
                             for (let i = 0; i < other.body.length; i += 3) {
                                 let segment = other.body[i];
-                                if (Math.hypot(px - segment.x, py - segment.y) < snake.size + other.size + 20) {
-                                    return true;
-                                }
+                                if (Math.hypot(px - segment.x, py - segment.y) < snake.size + other.size + 20) return true;
                             }
                         }
                         return false;
@@ -574,83 +685,65 @@
                     let dangerStraight = checkDanger(0, 40) || checkDanger(0, 90) || checkDanger(0, 140);
                     let dangerLeft = checkDanger(0.6, 70);
                     let dangerRight = checkDanger(-0.6, 70);
-                    let dangerHardLeft = checkDanger(1.2, 50);
-                    let dangerHardRight = checkDanger(-1.2, 50);
 
                     if (dangerStraight || dangerLeft || dangerRight) {
                         isDanger = true;
-                        if (!dangerHardLeft && (dangerRight || dangerStraight)) bestAngle += 0.2;
-                        else if (!dangerHardRight && (dangerLeft || dangerStraight)) bestAngle -= 0.2;
-                        else if (!dangerHardLeft) bestAngle += 0.25;
-                        else if (!dangerHardRight) bestAngle -= 0.25;
-                        else bestAngle += 0.3; 
+                        if (dangerRight || dangerStraight) bestAngle += 0.25;
+                        else if (dangerLeft || dangerStraight) bestAngle -= 0.25;
                     }
 
-                    if (!isDanger) {
-                        let targetX = null;
-                        let targetY = null;
-                        let closestEnemy = null;
-                        let enemyDist = 450; 
+                    let closestEnemy = null; let enemyDist = 450; 
+                    let bestFood = null; let foodScore = -1;
 
+                    if (!isDanger) {
+                        let targetX = null; let targetY = null;
                         for (let otherId in gameState.snakes) {
                             if (otherId === id) continue;
                             let other = gameState.snakes[otherId];
                             let dist = Math.hypot(other.x - snake.x, other.y - snake.y);
-                            if (dist < enemyDist) {
-                                enemyDist = dist;
-                                closestEnemy = other;
-                            }
+                            if (dist < enemyDist) { enemyDist = dist; closestEnemy = other; }
                         }
 
-                        let bestFood = null;
-                        let foodScore = -1;
                         for (let f of gameState.food) {
                             let dist = Math.hypot(f.x - snake.x, f.y - snake.y);
                             if (dist < 800) {
                                 let score = (f.size * f.size * f.size) / (dist + 1);
-                                if (score > foodScore) {
-                                    foodScore = score;
-                                    bestFood = f;
-                                }
+                                if (score > foodScore) { foodScore = score; bestFood = f; }
                             }
                         }
 
-                        if (bestFood && bestFood.size > 10 && foodScore > 5) {
-                            targetX = bestFood.x;
-                            targetY = bestFood.y;
-                        } 
-                        else if (closestEnemy && enemyDist < 350) {
-                            targetX = closestEnemy.x + Math.cos(closestEnemy.angle) * 120;
-                            targetY = closestEnemy.y - Math.sin(closestEnemy.angle) * 120;
-                        } 
-                        else if (bestFood) {
-                            targetX = bestFood.x;
-                            targetY = bestFood.y;
-                        }
+                        if (bestFood && bestFood.size > 10 && foodScore > 5) { targetX = bestFood.x; targetY = bestFood.y; } 
+                        else if (closestEnemy && enemyDist < 350) { targetX = closestEnemy.x + Math.cos(closestEnemy.angle) * 120; targetY = closestEnemy.y - Math.sin(closestEnemy.angle) * 120; } 
+                        else if (bestFood) { targetX = bestFood.x; targetY = bestFood.y; }
 
                         if (targetX !== null && targetY !== null) {
                             let angleToTarget = Math.atan2(snake.y - targetY, targetX - snake.x);
                             let diff = angleToTarget - snake.angle;
-                            while (diff > Math.PI) diff -= Math.PI * 2;
-                            while (diff < -Math.PI) diff += Math.PI * 2;
+                            while (diff > Math.PI) diff -= Math.PI * 2; while (diff < -Math.PI) diff += Math.PI * 2;
                             bestAngle += diff * 0.1;
-                        } else {
-                            if (Math.random() < 0.05) bestAngle += (Math.random() - 0.5) * 0.5;
-                        }
+                        } else { if (Math.random() < 0.05) bestAngle += (Math.random() - 0.5) * 0.5; }
                     }
 
                     snake.angle = bestAngle;
+                    if ((isDanger || (closestEnemy && enemyDist < 200)) && snake.length > 20) snake.isBoosting = (Math.random() < 0.7);
+                    else snake.isBoosting = false;
                 }
 
                 snake.body.unshift({ x: snake.x, y: snake.y });
                 if (snake.body.length > snake.length * 3) snake.body.pop();
 
-                snake.x += Math.cos(snake.angle) * SNAKE_SPEED;
-                snake.y -= Math.sin(snake.angle) * SNAKE_SPEED; 
-
-                if (snake.x < 0 || snake.x > WORLD_SIZE || snake.y < 0 || snake.y > WORLD_SIZE) {
-                    killSnake(id); continue;
+                let currentSpeed = SNAKE_SPEED;
+                if (snake.isBoosting && snake.length > 12) {
+                    currentSpeed = SNAKE_SPEED * 2.2; 
+                    snake.length -= 0.15; 
+                    if(snake.size > 12) snake.size -= 0.03; 
+                    if (Math.random() < 0.15) { let tail = snake.body[snake.body.length - 1]; if (tail) spawnFood(tail.x, tail.y, 4, snake.color); }
                 }
+
+                snake.x += Math.cos(snake.angle) * currentSpeed;
+                snake.y -= Math.sin(snake.angle) * currentSpeed; 
+
+                if (snake.x < 0 || snake.x > WORLD_SIZE || snake.y < 0 || snake.y > WORLD_SIZE) { killSnake(id); continue; }
 
                 let died = false;
                 for (let otherId in gameState.snakes) {
@@ -658,9 +751,7 @@
                     let other = gameState.snakes[otherId];
                     for (let i = 0; i < other.body.length; i += 3) {
                         let segment = other.body[i];
-                        if (Math.hypot(snake.x - segment.x, snake.y - segment.y) < snake.size + (other.size * 0.8)) {
-                            died = true; break;
-                        }
+                        if (Math.hypot(snake.x - segment.x, snake.y - segment.y) < snake.size + (other.size * 0.8)) { died = true; break; }
                     }
                     if(died) break;
                 }
@@ -669,8 +760,8 @@
                 for (let i = gameState.food.length - 1; i >= 0; i--) {
                     let f = gameState.food[i];
                     if (Math.hypot(snake.x - f.x, snake.y - f.y) < snake.size + f.size) {
-                        snake.length += (f.size > 10 ? 5 : 1); 
-                        if(snake.size < 40) snake.size += (f.size > 10 ? 0.5 : 0.1); 
+                        snake.length += (f.size > 10 ? 1 : 0.2); 
+                        if(snake.size < 40) snake.size += (f.size > 10 ? 0.1 : 0.02); 
                         gameState.food.splice(i, 1); 
                     }
                 }
@@ -678,97 +769,103 @@
 
             const statePacket = { type: 'state', state: gameState };
             connections.forEach(conn => { if(conn.open) conn.send(statePacket); });
-            drawGame();
+            
+            let me = gameState.snakes[myId];
+            drawGame(me ? me.x : WORLD_SIZE/2, me ? me.y : WORLD_SIZE/2, true);
         }
 
-        // --- ÇİZİM FONKSİYONU VE DESENLER ---
-        function drawGame() {
-            ctx.fillStyle = '#111'; ctx.fillRect(0, 0, width, height);
+        // --- ORTAK ÇİZİM FONKSİYONU ---
+        function drawGame(targetX, targetY, showUI) {
+            ctx.fillStyle = '#06112a'; 
+            ctx.fillRect(0, 0, width, height);
 
-            let me = gameState.snakes[myId];
-            let camX = me ? me.x - width / 2 : WORLD_SIZE / 2 - width / 2;
-            let camY = me ? me.y - height / 2 : WORLD_SIZE / 2 - height / 2;
+            let camX = targetX - width / 2;
+            let camY = targetY - height / 2;
 
             ctx.save(); ctx.translate(-camX, -camY);
 
             ctx.strokeStyle = '#ff4757'; ctx.lineWidth = 10;
             ctx.strokeRect(0, 0, WORLD_SIZE, WORLD_SIZE);
 
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)'; ctx.lineWidth = 1;
-            ctx.beginPath();
-            let startX = Math.floor(camX / 100) * 100; let startY = Math.floor(camY / 100) * 100;
-            for(let i = startX; i < camX + width; i+=100) { ctx.moveTo(i, camY); ctx.lineTo(i, camY+height); }
-            for(let i = startY; i < camY + height; i+=100) { ctx.moveTo(camX, i); ctx.lineTo(camX+width, i); }
+            ctx.strokeStyle = 'rgba(65, 105, 225, 0.15)'; ctx.lineWidth = 2; ctx.beginPath();
+            let gridSize = 60; 
+            let startX = Math.floor(camX / gridSize) * gridSize; let startY = Math.floor(camY / gridSize) * gridSize;
+            for(let i = startX; i < camX + width; i+=gridSize) { ctx.moveTo(i, camY); ctx.lineTo(i, camY+height); }
+            for(let i = startY; i < camY + height; i+=gridSize) { ctx.moveTo(camX, i); ctx.lineTo(camX+width, i); }
             ctx.stroke();
+
+            ctx.fillStyle = 'rgba(100, 149, 237, 0.3)';
+            for(let i = startX; i < camX + width; i+=gridSize) {
+                for(let j = startY; j < camY + height; j+=gridSize) { ctx.beginPath(); ctx.arc(i, j, 2, 0, Math.PI*2); ctx.fill(); }
+            }
 
             gameState.food.forEach(f => {
                 if(f.x > camX - 20 && f.x < camX + width + 20 && f.y > camY - 20 && f.y < camY + height + 20) {
-                    ctx.fillStyle = f.color; 
-                    ctx.beginPath(); 
-                    ctx.arc(f.x, f.y, f.size, 0, Math.PI * 2); 
-                    ctx.fill();
+                    ctx.fillStyle = f.color; ctx.beginPath(); ctx.arc(f.x, f.y, f.size, 0, Math.PI * 2); ctx.fill();
                 }
             });
 
+            if(gameState.particles) {
+                gameState.particles.forEach(p => {
+                    ctx.globalAlpha = Math.max(0, p.life);
+                    if (p.type === 'text') {
+                        ctx.fillStyle = p.color; ctx.font = "bold 26px Arial"; ctx.textAlign = "center";
+                        ctx.shadowColor = "black"; ctx.shadowBlur = 5; ctx.fillText(p.text, p.x, p.y); ctx.shadowBlur = 0;
+                    } else {
+                        ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill();
+                    }
+                    ctx.globalAlpha = 1.0;
+                });
+            }
+
             for (let id in gameState.snakes) {
                 let snake = gameState.snakes[id];
-                
-                let currentPattern = (snake.pattern && bodyPatterns[snake.pattern]) ? bodyPatterns[snake.pattern] : null;
+                let currentP = (snake.pattern && bodyPatterns[snake.pattern]) ? bodyPatterns[snake.pattern] : null;
 
                 for (let i = 0; i < snake.body.length; i+=2) { 
                     let segment = snake.body[i]; 
-                    
-                    if(currentPattern) {
-                        ctx.fillStyle = currentPattern[Math.floor(i / 2) % currentPattern.length];
-                    } else {
-                        ctx.fillStyle = snake.color;
-                    }
+                    if(currentP) { ctx.fillStyle = currentP[Math.floor(i / 2) % currentP.length]; } 
+                    else { ctx.fillStyle = snake.color; }
 
                     ctx.beginPath();
                     let radius = snake.size * (1 - (i / snake.body.length) * 0.4);
-                    ctx.arc(segment.x, segment.y, radius, 0, Math.PI * 2); 
-                    ctx.fill();
+                    if (snake.isBoosting && i > 0) radius *= 0.8; 
+                    ctx.arc(segment.x, segment.y, radius, 0, Math.PI * 2); ctx.fill();
                 }
 
                 let isHeadDrawn = false;
                 if (snake.skin && skinImages[snake.skin] && skinImages[snake.skin].complete) {
                     let img = skinImages[snake.skin];
                     if (img.naturalWidth > 0) { 
-                        ctx.save();
-                        ctx.translate(snake.x, snake.y);
-                        ctx.rotate(Math.PI / 2 - snake.angle); 
-                        let r = snake.size * 1.5;
-                        ctx.drawImage(img, -r, -r, r * 2, r * 2);
-                        ctx.restore();
-                        isHeadDrawn = true;
+                        ctx.save(); ctx.translate(snake.x, snake.y); ctx.rotate(Math.PI / 2 - snake.angle); 
+                        let r = snake.size * 1.5; ctx.drawImage(img, -r, -r, r * 2, r * 2); ctx.restore(); isHeadDrawn = true;
                     }
                 }
                 
                 if (!isHeadDrawn) {
-                    ctx.fillStyle = currentPattern ? currentPattern[0] : snake.color;
+                    ctx.fillStyle = currentP ? currentP[0] : snake.color;
                     ctx.beginPath(); ctx.arc(snake.x, snake.y, snake.size, 0, Math.PI * 2); ctx.fill();
                     
                     ctx.fillStyle = "white";
-                    let eyeOffsetX = Math.cos(snake.angle + Math.PI/4) * (snake.size * 0.5);
-                    let eyeOffsetY = -Math.sin(snake.angle + Math.PI/4) * (snake.size * 0.5);
-                    ctx.beginPath(); ctx.arc(snake.x + eyeOffsetX, snake.y + eyeOffsetY, snake.size * 0.3, 0, Math.PI * 2); ctx.fill();
-                    
-                    let eyeOffsetX2 = Math.cos(snake.angle - Math.PI/4) * (snake.size * 0.5);
-                    let eyeOffsetY2 = -Math.sin(snake.angle - Math.PI/4) * (snake.size * 0.5);
-                    ctx.beginPath(); ctx.arc(snake.x + eyeOffsetX2, snake.y + eyeOffsetY2, snake.size * 0.3, 0, Math.PI * 2); ctx.fill();
+                    let ex = Math.cos(snake.angle + Math.PI/4) * (snake.size * 0.5); let ey = -Math.sin(snake.angle + Math.PI/4) * (snake.size * 0.5);
+                    ctx.beginPath(); ctx.arc(snake.x + ex, snake.y + ey, snake.size * 0.3, 0, Math.PI * 2); ctx.fill();
+                    let ex2 = Math.cos(snake.angle - Math.PI/4) * (snake.size * 0.5); let ey2 = -Math.sin(snake.angle - Math.PI/4) * (snake.size * 0.5);
+                    ctx.beginPath(); ctx.arc(snake.x + ex2, snake.y + ey2, snake.size * 0.3, 0, Math.PI * 2); ctx.fill();
                     
                     ctx.fillStyle = "black";
-                    ctx.beginPath(); ctx.arc(snake.x + eyeOffsetX, snake.y + eyeOffsetY, snake.size * 0.15, 0, Math.PI * 2); ctx.fill();
-                    ctx.beginPath(); ctx.arc(snake.x + eyeOffsetX2, snake.y + eyeOffsetY2, snake.size * 0.15, 0, Math.PI * 2); ctx.fill();
+                    ctx.beginPath(); ctx.arc(snake.x + ex, snake.y + ey, snake.size * 0.15, 0, Math.PI * 2); ctx.fill();
+                    ctx.beginPath(); ctx.arc(snake.x + ex2, snake.y + ey2, snake.size * 0.15, 0, Math.PI * 2); ctx.fill();
                 }
 
-                ctx.fillStyle = "white"; ctx.font = "bold 14px Arial"; ctx.textAlign = "center";
-                let displayName = id === myId ? "Sen (" + snake.name + ")" : snake.name;
-                ctx.fillText(displayName, snake.x, snake.y - snake.size - 10);
+                if(showUI) {
+                    ctx.fillStyle = "white"; ctx.font = "bold 14px Arial"; ctx.textAlign = "center";
+                    let displayName = id === myId ? "Sen (" + snake.name + ")" : snake.name;
+                    ctx.fillText(displayName, snake.x, snake.y - snake.size - 10);
+                }
             }
             ctx.restore();
 
-            if (gameState.leaderboard && gameState.leaderboard.length > 0) {
+            if (showUI && gameState.leaderboard && gameState.leaderboard.length > 0) {
                 let lbX = width - 180; let lbY = 20;
                 ctx.fillStyle = "rgba(0, 0, 0, 0.5)"; ctx.roundRect(lbX, lbY, 160, 150, 10); ctx.fill();
                 ctx.fillStyle = "white"; ctx.font = "bold 16px Arial"; ctx.textAlign = "center";

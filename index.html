@@ -91,6 +91,46 @@
 
         #bottom-right-ui { bottom: 30px; right: 30px; display: flex; flex-direction: column; align-items: flex-end; gap: 15px; }
         
+        #bottom-left-ui { bottom: 30px; left: 30px; display: flex; flex-direction: column; align-items: flex-start; }
+        #settings-btn {
+            background: rgba(0,0,0,0.7); color: white; border: 2px solid rgba(255,255,255,0.3);
+            padding: 12px 20px; border-radius: 20px; font-weight: bold; font-size: 18px;
+            cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.5); transition: 0.2s;
+        }
+        #settings-btn:hover { border-color: #3498db; background: rgba(52, 152, 219, 0.4); transform: scale(1.05); }
+
+        #settings-modal {
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85); z-index: 200; justify-content: center; align-items: center; pointer-events: auto;
+        }
+        .settings-content {
+            background: #0f172a; padding: 40px; border-radius: 20px; border: 2px solid #3498db;
+            color: white; text-align: center; box-shadow: 0 0 30px rgba(52, 152, 219, 0.5); min-width: 300px;
+        }
+        .settings-content h2 { margin-top: 0; color: #3498db; font-size: 28px; text-shadow: 0 0 10px rgba(52,152,219,0.5); }
+        .setting-row { margin: 25px 0; font-size: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; }
+        .setting-row input { width: 22px; height: 22px; cursor: pointer; }
+
+        /* YENİ ODA KURULUM LOBİSİ (BAŞLAMADAN ÖNCE) */
+        #host-lobby-modal {
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9); z-index: 150; justify-content: center; align-items: center; pointer-events: auto;
+        }
+        .lobby-content {
+            background: #0f172a; padding: 40px; border-radius: 20px; border: 2px solid #2ecc71;
+            color: white; text-align: center; box-shadow: 0 0 30px rgba(46, 204, 113, 0.5); max-width: 90%;
+        }
+        .lobby-id-box {
+            display: flex; gap: 10px; justify-content: center; margin-top: 20px;
+        }
+        #lobby-room-id {
+            padding: 12px; font-size: 20px; text-align: center; border-radius: 10px; border: none; font-weight: bold; background: #fff; color: #000; width: 200px;
+        }
+        #lobby-copy-btn {
+            padding: 12px 20px; font-size: 18px; background: #3498db; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.2s;
+        }
+        #lobby-copy-btn:hover { background: #2980b9; transform: scale(1.05); }
+
         #gameModeSelect {
             background: rgba(0,0,0,0.7); color: white; border: 2px solid rgba(255,255,255,0.3);
             padding: 12px 15px; border-radius: 15px; font-weight: bold; font-size: 15px;
@@ -124,10 +164,24 @@
             100% { box-shadow: 0 0 15px rgba(46, 204, 113, 0.4); }
         }
 
-        #game-ui { position: absolute; top: 10px; left: 10px; z-index: 10; display: none; background: rgba(0,0,0,0.6); color: white; padding: 10px; border-radius: 8px; font-family: monospace; min-width: 200px; pointer-events: none; }
+        #game-ui { 
+            position: absolute; top: 15px; left: 15px; z-index: 10; display: none; 
+            flex-direction: column; gap: 10px; font-family: 'Segoe UI', sans-serif; pointer-events: none; 
+        }
         #game-ui button { pointer-events: auto; }
-        #status { margin-bottom: 10px; }
         
+        #room-info {
+            display: none; align-items: center; gap: 10px; background: rgba(0, 0, 0, 0.8);
+            padding: 10px 15px; border-radius: 12px; border: 2px solid #4CAF50;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5); pointer-events: auto;
+        }
+        #room-id-display { font-weight: bold; color: #2ecc71; font-size: 18px; letter-spacing: 1px; }
+        #copy-btn {
+            cursor: pointer; background: #3498db; color: white; border: none; border-radius: 8px;
+            padding: 6px 12px; font-weight: bold; font-size: 14px; transition: 0.2s;
+        }
+        #copy-btn:hover { transform: scale(1.05); box-shadow: 0 0 10px #3498db; }
+
         #joystick-zone { position: absolute; bottom: 20px; left: 20px; width: 130px; height: 130px; z-index: 10; display: none; }
 
         #powerup-ui {
@@ -178,9 +232,17 @@
             #hostIdInput { width: 90px; padding: 8px; font-size: 12px;}
             .btn-join { padding: 8px 12px; font-size: 12px; }
             #gameModeSelect { padding: 8px; font-size: 12px; }
+            #settings-btn { padding: 8px 15px; font-size: 14px; }
+            #bottom-left-ui { bottom: 20px; left: 20px; }
             #boost-btn { bottom: 20px; right: 20px; width: 70px; height: 70px; font-size: 12px; }
             .pu-box { padding: 5px 10px; font-size: 14px; gap: 5px; }
             .pu-time { font-size: 16px; }
+            #room-info { padding: 8px 10px; gap: 5px; }
+            #room-id-display { font-size: 14px; }
+            #copy-btn { padding: 5px 8px; font-size: 12px; }
+            .lobby-content h1 { font-size: 24px; }
+            #lobby-room-id { width: 150px; font-size: 16px; }
+            #lobby-copy-btn { font-size: 16px; }
         }
 
         #death-screen {
@@ -205,7 +267,7 @@
             <img src="yılanss.png" alt="Yılanss" onerror="this.src='data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='">
             <img src="Yükleme1.png" alt="Yükleniyor" onerror="this.src='data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='">
         </div>
-        <h2 style="margin-bottom: 20px; font-size: 24px;">Oyun Hazırlanıyor... <span id="loading-text">0%</span></h2>
+        <h2 style="margin-bottom: 20px; font-size: 24px;"><span id="loading-text">Oyun Hazırlanıyor...</span></h2>
         <div id="loading-bar-container">
             <div id="loading-bar"></div>
         </div>
@@ -243,6 +305,10 @@
             </div>
         </div>
 
+        <div id="bottom-left-ui" class="menu-element">
+            <button id="settings-btn" onclick="openSettings()">⚙️ Ayarlar</button>
+        </div>
+
         <div id="bottom-right-ui" class="menu-element">
             <select id="gameModeSelect">
                 <option value="classic">🟢 Klasik (Güçler Haritada Çıkar)</option>
@@ -253,13 +319,46 @@
                 <input type="text" id="hostIdInput" placeholder="Oda ID Gir">
                 <button class="btn-join" onclick="joinGame()">Odaya Katıl</button>
             </div>
-            <button class="btn-start" onclick="startGame()">BAŞLA</button>
+            <button class="btn-start" onclick="hostRoom()">ODA KUR</button>
+        </div>
+    </div>
+
+    <div id="settings-modal">
+        <div class="settings-content">
+            <h2>Ayarlar</h2>
+            <label class="setting-row">
+                <input type="checkbox" id="soundToggle" checked onchange="toggleSound()">
+                🔊 Ses Efektleri (Patlama/Silah Sesi)
+            </label>
+            <br>
+            <button class="menu-btn-small" style="width: 150px; margin-top: 10px;" onclick="closeSettings()">Kapat</button>
+        </div>
+    </div>
+
+    <div id="host-lobby-modal">
+        <div class="lobby-content">
+            <h1 style="color:#2ecc71; margin-top:0;">Oda Kuruldu! 🐍</h1>
+            <p style="font-size:18px;">Arkadaşlarının odaya katılmasını bekle veya hemen oynamaya başla!</p>
+            
+            <div class="lobby-id-box">
+                <input type="text" id="lobby-room-id" readonly>
+                <button id="lobby-copy-btn" onclick="copyLobbyRoomId()">📋 Kopyala</button>
+            </div>
+
+            <div style="margin-top: 30px;">
+                <button class="btn-start" onclick="startActualGame()" style="font-size: 24px; padding: 15px 40px;">⚔️ OYUNU BAŞLAT</button>
+            </div>
         </div>
     </div>
 
     <div id="game-ui">
-        <div id="status">Bağlanıyor...</div>
-        <button class="menu-btn-small exit" style="margin-top:5px; padding: 5px 10px; font-size: 14px;" onclick="returnToMenu()">Menüye Dön</button>
+        <div id="room-info">
+            <span style="color:#ccc; font-size:14px;">Oda ID:</span>
+            <span id="room-id-display"></span>
+            <button id="copy-btn" onclick="copyRoomId()">📋 Kopyala</button>
+        </div>
+
+        <button class="menu-btn-small exit" style="width: 100%;" onclick="returnToMenu()">🚪 Menüye Dön</button>
     </div>
 
     <div id="death-screen">
@@ -296,6 +395,77 @@
                 if (el.requestFullscreen) { el.requestFullscreen(); } 
                 else if (el.webkitRequestFullscreen) { el.webkitRequestFullscreen(); }
             }
+        }
+
+        // --- SES (AUDIO) SİSTEMİ ---
+        let audioCtx;
+        let soundEnabled = true;
+
+        function toggleSound() {
+            soundEnabled = document.getElementById('soundToggle').checked;
+        }
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playExplosionSound() {
+            if (!soundEnabled || !audioCtx) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const bufferSize = audioCtx.sampleRate * 0.5; 
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1; 
+            }
+            
+            const noise = audioCtx.createBufferSource();
+            noise.buffer = buffer;
+            
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(1000, audioCtx.currentTime);
+            filter.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.4); 
+            
+            const gain = audioCtx.createGain();
+            gain.gain.setValueAtTime(1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4); 
+            
+            noise.connect(filter);
+            filter.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            noise.start();
+        }
+
+        function openSettings() { document.getElementById('settings-modal').style.display = 'flex'; }
+        function closeSettings() { document.getElementById('settings-modal').style.display = 'none'; }
+
+        // --- ODA KOPYALAMA İŞLEMLERİ ---
+        let currentRoomId = "";
+        function copyRoomId() {
+            if(!currentRoomId) return;
+            navigator.clipboard.writeText(currentRoomId).then(() => {
+                let btn = document.getElementById('copy-btn');
+                btn.innerText = "✅ Kopyalandı!";
+                btn.style.background = "#2ecc71";
+                setTimeout(() => { btn.innerText = "📋 Kopyala"; btn.style.background = "#3498db"; }, 2000);
+            });
+        }
+        function copyLobbyRoomId() {
+            if(!currentRoomId) return;
+            navigator.clipboard.writeText(currentRoomId).then(() => {
+                let btn = document.getElementById('lobby-copy-btn');
+                btn.innerText = "✅ Kopyalandı!";
+                btn.style.background = "#2ecc71";
+                setTimeout(() => { btn.innerText = "📋 Kopyala"; btn.style.background = "#3498db"; }, 2000);
+            });
         }
 
         const bodyPatterns = {
@@ -342,7 +512,7 @@
                     loadedAssets++;
                     let percent = Math.floor((loadedAssets / assetsToLoad.length) * 100);
                     document.getElementById('loading-bar').style.width = percent + '%';
-                    document.getElementById('loading-text').innerText = percent + '%';
+                    if(document.getElementById('loading-text')) document.getElementById('loading-text').innerText = percent + '%';
                     if (asset.type === 'skin') skinImages[asset.id] = img;
                     if (loadedAssets === assetsToLoad.length) setTimeout(finishLoading, 600); 
                 };
@@ -418,7 +588,6 @@
             let startX = isMenuBot ? WORLD_SIZE/2 + (Math.random()-0.5)*1500 : Math.random() * (WORLD_SIZE - 400) + 200;
             let startY = isMenuBot ? WORLD_SIZE/2 + (Math.random()-0.5)*1500 : Math.random() * (WORLD_SIZE - 400) + 200;
             
-            // DÜZELTME: Sadece bot olmayanlar (yani oyuncular) güçlü başlar.
             let initialPowerups = { magnet: 0, ghost: 0, x2: 0 };
             if (!isBot && currentGameMode === 'overpowered') {
                 initialPowerups = { magnet: 10, ghost: 10, x2: 10 };
@@ -503,7 +672,8 @@
         function showGameScreen() {
             inMenuMode = false; 
             document.getElementById('main-menu').style.display = 'none';
-            document.getElementById('game-ui').style.display = 'block';
+            document.getElementById('host-lobby-modal').style.display = 'none';
+            document.getElementById('game-ui').style.display = 'flex'; 
             document.getElementById('joystick-zone').style.display = 'block';
             document.getElementById('boost-btn').style.display = 'flex'; 
             requestFullScreen(); initJoystick(); 
@@ -511,30 +681,31 @@
 
         function returnToMenu() { window.location.reload(); }
 
-        function startGame() {
+        // --- ODA KURULUMU (LOBİ EKRANINI AÇAR) ---
+        function hostRoom() {
+            initAudio(); 
             myName = getPlayerName();
             currentGameMode = document.getElementById('gameModeSelect').value; 
-            showGameScreen();
             
-            gameState.snakes = {}; gameState.powerups = [];
+            document.getElementById('main-menu').style.display = 'none';
+            document.getElementById('loading-screen').style.display = 'flex';
+            if(document.getElementById('loading-text')) document.getElementById('loading-text').innerText = "Oda Kuruluyor...";
+            document.getElementById('loading-bar').style.width = '100%';
             
             peer = new Peer();
             peer.on('open', (id) => {
                 myId = id; isHost = true;
-                document.getElementById('status').innerHTML = "Oda ID: <strong style='color:#4CAF50;'>" + id + "</strong>";
+                currentRoomId = id; 
                 
-                spawnSnake(myId, myName, false, mySkin, myPattern, false);
-                for(let i=0; i<MAX_FOOD; i++) spawnFood();
+                document.getElementById('loading-screen').style.display = 'none';
                 
-                for(let i=0; i<10; i++) spawnPowerup(); 
+                // LOBİ EKRANINI GÖSTER
+                document.getElementById('host-lobby-modal').style.display = 'flex';
+                document.getElementById('lobby-room-id').value = id;
                 
-                for(let i=0; i<MAX_BOTS; i++) {
-                    let botPattern = Math.random() > 0.3 ? patternKeys[Math.floor(Math.random() * patternKeys.length)] : null;
-                    spawnSnake("bot_" + i, botNames[Math.floor(Math.random() * botNames.length)], true, null, botPattern, false); 
-                }
-
-                lastRenderTime = performance.now();
-                requestAnimationFrame(hostGameLoop);
+                // Oyun İçi UI için ID'yi hazırla
+                document.getElementById('room-id-display').innerText = id;
+                document.getElementById('room-info').style.display = 'flex';
             });
 
             peer.on('connection', (conn) => {
@@ -550,19 +721,46 @@
             });
         }
 
+        // --- GERÇEK OYUNU LOBİDEN SONRA BAŞLATMA ---
+        function startActualGame() {
+            showGameScreen();
+            
+            gameState.snakes = {}; gameState.powerups = [];
+            spawnSnake(myId, myName, false, mySkin, myPattern, false);
+            for(let i=0; i<MAX_FOOD; i++) spawnFood();
+            for(let i=0; i<10; i++) spawnPowerup(); 
+            for(let i=0; i<MAX_BOTS; i++) {
+                let botPattern = Math.random() > 0.3 ? patternKeys[Math.floor(Math.random() * patternKeys.length)] : null;
+                spawnSnake("bot_" + i, botNames[Math.floor(Math.random() * botNames.length)], true, null, botPattern, false); 
+            }
+
+            lastRenderTime = performance.now();
+            requestAnimationFrame(hostGameLoop);
+        }
+
         function joinGame() {
+            initAudio();
             const hostId = document.getElementById('hostIdInput').value;
             myName = getPlayerName();
             if (!hostId) return alert("Lütfen arkadaşının ID'sini gir!");
 
-            showGameScreen();
+            document.getElementById('main-menu').style.display = 'none';
+            document.getElementById('loading-screen').style.display = 'flex';
+            if(document.getElementById('loading-text')) document.getElementById('loading-text').innerText = "Odaya Bağlanılıyor...";
+
             gameState.snakes = {}; 
             
             peer = new Peer();
             peer.on('open', (id) => {
                 myId = id; serverConn = peer.connect(hostId);
                 serverConn.on('open', () => {
-                    document.getElementById('status').innerText = "Odaya Bağlanıldı!";
+                    currentRoomId = hostId;
+                    document.getElementById('loading-screen').style.display = 'none';
+                    
+                    showGameScreen();
+                    document.getElementById('room-id-display').innerText = hostId;
+                    document.getElementById('room-info').style.display = 'flex';
+
                     serverConn.send({ type: 'join', name: myName, skin: mySkin, pattern: myPattern }); 
                     setInterval(() => {
                         if(document.getElementById('death-screen').style.display !== 'flex') {
@@ -576,6 +774,9 @@
                         gameState = data.state; checkMyDeath(); 
                         let me = gameState.snakes[myId];
                         drawGame(me ? me.x : WORLD_SIZE/2, me ? me.y : WORLD_SIZE/2, true);
+                    } else if (data.type === 'playSound') {
+                        // Sunucudan (Host) gelen ses çalma isteği (öldürdüysek veya öldüysek)
+                        if (!inMenuMode) playExplosionSound();
                     }
                 });
             });
@@ -594,9 +795,28 @@
             }
         }
 
-        function killSnake(id) {
+        // SES SADECE SEN VEYA ARKADAŞIN OLAYA KARIŞTIYSA ÇIKACAK! (Katil = Sen veya Ölen = Sen)
+        function killSnake(id, killerId) {
             let snake = gameState.snakes[id];
             if(!snake) return;
+
+            if (!inMenuMode) { 
+                // Eğer host kendi öldüyse veya kendi birini öldürdüyse
+                if (id === myId || killerId === myId) {
+                    playExplosionSound();
+                } else {
+                    // Host başkalarının olayını kontrol ediyor (Arkadaşın öldürdüyse arkadaşına ses gönder)
+                    if (killerId && connections.find(c => c.peer === killerId)) {
+                        let conn = connections.find(c => c.peer === killerId);
+                        if (conn && conn.open) conn.send({ type: 'playSound' });
+                    }
+                    // Arkadaşın öldüyse arkadaşına ses gönder
+                    if (connections.find(c => c.peer === id)) {
+                        let conn = connections.find(c => c.peer === id);
+                        if (conn && conn.open) conn.send({ type: 'playSound' });
+                    }
+                }
+            }
 
             snake.body.forEach((segment, index) => {
                 if (index % 3 === 0) spawnFood(segment.x, segment.y, Math.min(snake.size * 0.8, 18), snake.color);
@@ -780,9 +1000,10 @@
                 snake.x += Math.cos(snake.angle) * currentSpeed;
                 snake.y -= Math.sin(snake.angle) * currentSpeed; 
 
-                if (snake.x < 0 || snake.x > WORLD_SIZE || snake.y < 0 || snake.y > WORLD_SIZE) { killSnake(id); continue; }
+                if (snake.x < 0 || snake.x > WORLD_SIZE || snake.y < 0 || snake.y > WORLD_SIZE) { killSnake(id, null); continue; }
 
                 let died = false;
+                let killerId = null;
                 if (snake.activePowerups['ghost'] <= 0) {
                     for (let otherId in gameState.snakes) {
                         if (id === otherId) continue;
@@ -790,12 +1011,17 @@
                         if (other.activePowerups && other.activePowerups['ghost'] > 0) continue; 
                         for (let i = 0; i < other.body.length; i += 3) {
                             let segment = other.body[i];
-                            if (Math.hypot(snake.x - segment.x, snake.y - segment.y) < snake.size + (other.size * 0.8)) { died = true; break; }
+                            // Çarpışma: Yılanın kafası başka bir yılanın vücuduna değdi mi?
+                            if (Math.hypot(snake.x - segment.x, snake.y - segment.y) < snake.size + (other.size * 0.8)) { 
+                                died = true; 
+                                killerId = otherId; // Seni öldürenin kim olduğunu kaydet
+                                break; 
+                            }
                         }
                         if(died) break;
                     }
                 }
-                if (died) { killSnake(id); continue; }
+                if (died) { killSnake(id, killerId); continue; } // Katil ID ile birlikte öldürme fonksiyonunu çağır
 
                 let multiplier = (snake.activePowerups['x2'] > 0) ? 2 : 1;
                 for (let i = gameState.food.length - 1; i >= 0; i--) {

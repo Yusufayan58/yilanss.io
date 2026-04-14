@@ -45,6 +45,13 @@
         }
         .menu-element { pointer-events: auto; position: absolute; } 
 
+        #money-display {
+            position: absolute; top: 20px; right: 160px; 
+            background: rgba(0,0,0,0.7); padding: 10px 20px; border-radius: 20px; 
+            border: 2px solid #f1c40f; color: #f1c40f; font-weight: bold; font-size: 18px; 
+            z-index: 110; pointer-events: none; box-shadow: 0 0 15px rgba(241, 196, 15, 0.4);
+        }
+
         #top-left-ui { top: 20px; left: 20px; display: flex; flex-direction: column; align-items: flex-start; }
         #menu-logo-small { width: 80px; height: 80px; border-radius: 50%; box-shadow: 0 0 20px rgba(76, 175, 80, 0.6); margin-bottom: 10px; }
         #playerName {
@@ -196,6 +203,7 @@
         .pu-box.magnet { border-color: #3498db; box-shadow: 0 0 20px rgba(52, 152, 219, 0.6); }
         .pu-box.ghost { border-color: #ecf0f1; box-shadow: 0 0 20px rgba(236, 240, 241, 0.6); }
         .pu-box.x2 { border-color: #f1c40f; box-shadow: 0 0 20px rgba(241, 196, 15, 0.6); }
+        .pu-box.shield { border-color: #2ecc71; box-shadow: 0 0 20px rgba(46, 204, 113, 0.6); }
         
         .pu-time { font-size: 20px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
         .pu-time.warning { color: #e74c3c; animation: blink 0.4s infinite alternate; }
@@ -212,6 +220,13 @@
         }
         #boost-btn:active { background: #ff4757; transform: scale(0.9); box-shadow: 0 0 40px rgba(255, 71, 87, 1); border-color: white; }
 
+        #combo-text {
+            position: absolute; top: 25%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 50px; font-weight: 900; color: #f39c12; text-shadow: 0 0 20px rgba(243, 156, 18, 0.8), 2px 2px 0 #000;
+            z-index: 200; pointer-events: none; opacity: 0; transition: opacity 0.2s, transform 0.2s;
+            text-align: center; font-style: italic;
+        }
+
         #orientation-warning {
             display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(135deg, #c0392b, #e74c3c); color: white; z-index: 200;
@@ -220,6 +235,7 @@
         @media screen and (orientation: portrait) { #orientation-warning { display: flex; } }
 
         @media (max-width: 768px), (max-height: 600px) {
+            #money-display { top: 20px; right: 120px; padding: 5px 10px; font-size: 14px; }
             #menu-logo-small { width: 50px; height: 50px; }
             #playerName { width: 150px; padding: 10px 15px; font-size: 14px; }
             #center-ui { flex-direction: row; gap: 15px; transform: translate(-50%, -40%); }
@@ -278,6 +294,9 @@
     <canvas id="gameCanvas"></canvas>
 
     <div id="main-menu">
+        <div id="money-display">
+            💰 <span id="total-money">0</span>
+        </div>
         <div id="top-left-ui" class="menu-element">
             <img src="yılanss.png" id="menu-logo-small" alt="Logo" onerror="this.style.display='none'">
             <input type="text" id="playerName" placeholder="Oyuncu Adı" value="">
@@ -363,8 +382,12 @@
         <button class="menu-btn-small exit" style="width: 100%; font-size: 16px;" onclick="returnToMenu()">🚪 Menüye Dön</button>
     </div>
 
+    <div id="combo-text">DOUBLE KİLL!</div>
+
     <div id="death-screen">
         <h1>ÖLDÜN!</h1>
+        <div style="font-size: 24px; margin-bottom: 10px;">Skor: <span id="final-score-text" style="font-weight:bold; color:#fff;">0</span></div>
+        <div style="font-size: 24px; color: #f1c40f; font-weight: bold; margin-bottom: 20px;">Kazanılan: 💰 +<span id="earned-money-text">0</span></div>
         <div class="death-buttons">
             <button class="menu-btn-small" onclick="respawn()" style="width: 160px; font-size: 20px;">Yeniden Doğ</button>
             <button class="menu-btn-small exit" onclick="returnToMenu()" style="width: 160px; font-size: 20px;">Menüye Dön</button>
@@ -378,11 +401,18 @@
         <div id="pu-magnet" class="pu-box magnet">🧲 <span class="pu-time"></span></div>
         <div id="pu-ghost" class="pu-box ghost">👻 <span class="pu-time"></span></div>
         <div id="pu-x2" class="pu-box x2">⭐ <span class="pu-time"></span></div>
+        <div id="pu-shield" class="pu-box shield">🛡️ <span class="pu-time"></span></div>
     </div>
 
     <script>
+        let userMoney = parseInt(localStorage.getItem('yilanss_money')) || 0;
+        document.addEventListener("DOMContentLoaded", () => {
+            let el = document.getElementById('total-money');
+            if(el) el.innerText = userMoney;
+        });
+
         const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d', { alpha: false }); // Optimizasyon: Alfa kanalı kapatıldı
+        const ctx = canvas.getContext('2d', { alpha: false });
         let width = window.innerWidth; let height = window.innerHeight;
         canvas.width = width; canvas.height = height;
 
@@ -463,24 +493,44 @@
             'ari': ['#f1c40f', '#2c3e50', '#f1c40f', '#2c3e50'],
             'karpuz': ['#27ae60', '#e74c3c', '#2c3e50', '#e74c3c'],
             'kamuflaj': ['#78e08f', '#38ada9', '#b8e994', '#079992'],
-            'buzul': ['#ffffff', '#c8d6e5', '#8395a7', '#54a0ff']
+            'buzul': ['#ffffff', '#c8d6e5', '#8395a7', '#54a0ff'],
+            'kristal': ['rgba(0, 210, 211, 0.6)', 'rgba(255, 255, 255, 0.4)', 'rgba(0, 210, 211, 0.3)'],
+            'hayalet': ['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.1)'],
+            'altin': ['#f1c40f', '#f39c12', '#d4af37']
         };
         const patternKeys = [null, ...Object.keys(bodyPatterns)];
-        const patternNames = ["Klasik", "Gökkuşağı", "Kaplan", "Zebra", "Ateş", "Okyanus", "Neon", "Orman", "Galaksi", "Şeker", "Zehir", "Lav", "Arı", "Karpuz", "Kamuflaj", "Buzul"];
+        const patternNames = ["Klasik", "Gökkuşağı", "Kaplan", "Zebra", "Ateş", "Okyanus", "Neon", "Orman", "Galaksi", "Şeker", "Zehir", "Lav", "Arı", "Karpuz", "Kamuflaj", "Buzul", "Kristal", "Hayalet", "Altın"];
         const headKeys = [null, 'ömer', 'yusuf', 'enes'];
         const headNames = ["Düz (Resimsiz)", "Ömer", "Yusuf", "Enes"];
+
+        const comboNames = ["", "KİLL!", "DOUBLE KİLL!", "TRİPLE KİLL!", "MEGA KİLL!", "MONSTER KİLL!", "GODLİKE!"];
+
+        function showComboText(count) {
+            const el = document.getElementById('combo-text');
+            const name = comboNames[Math.min(count, comboNames.length - 1)] || "GODLİKE!";
+            el.innerText = name;
+            el.style.opacity = "1";
+            el.style.transform = "translate(-50%, -50%) scale(1.3)";
+            el.style.color = count > 3 ? "#ff4757" : "#f39c12";
+            
+            if(window.comboTimeout) clearTimeout(window.comboTimeout);
+            window.comboTimeout = setTimeout(() => { 
+                el.style.opacity = "0"; 
+                el.style.transform = "translate(-50%, -50%) scale(1)";
+            }, 1500);
+        }
 
         let currentPatternIndex = 0; let currentHeadIndex = 0;
         let myPattern = null; let mySkin = null;
 
         const baseColors = ['#ff4757', '#2ed573', '#1e90ff', '#ffa502', '#ff6b81', '#7bed9f', '#70a1ff', '#eccc68', '#ff7f50', '#ffffff'];
         
-        // OPTİMİZASYON: Yemler ve Yılan Boğumları (Segment) ön-belleğe alınıyor.
         const foodCache = {};
         const segmentCache = {};
         let hexBackgroundPattern = null;
 
         function darkenColor(color, percent) {
+            if (color.startsWith('rgba')) return color;
             let num = parseInt(color.replace("#",""),16),
             amt = Math.round(2.55 * percent),
             R = (num >> 16) + amt, B = (num >> 8 & 0x00FF) + amt, G = (num & 0x0000FF) + amt;
@@ -488,7 +538,6 @@
         }
 
         function initCaches() {
-            // Yem (Food) Cache
             baseColors.forEach(color => {
                 let oc = document.createElement('canvas');
                 let r = 20; 
@@ -505,13 +554,12 @@
                 foodCache[color] = oc;
             });
 
-            // Yılan Boğumu (Segment) Cache
             let allColors = new Set([...baseColors]);
             for(let key in bodyPatterns) { bodyPatterns[key].forEach(c => allColors.add(c)); }
             
             allColors.forEach(color => {
                 let oc = document.createElement('canvas');
-                let r = 40; // Büyük boyutta renderla, kalitesi düşmesin
+                let r = 40; 
                 oc.width = r*2; oc.height = r*2;
                 let octx = oc.getContext('2d');
 
@@ -610,7 +658,7 @@
         
         let gameState = { snakes: {}, food: [], leaderboard: [], particles: [], powerups: [], rankings: [] };
         let currentGameMode = 'classic';
-        const POWERUP_TYPES = ['magnet', 'ghost', 'x2'];
+        const POWERUP_TYPES = ['magnet', 'ghost', 'x2', 'shield'];
         const botNames = ["Alpha", "Gölge", "Yokedici", "Sinsi", "Kobra", "Titan", "Ninja", "Avcı", "Rüzgar", "Hızlı", "Zehir", "Gaddar", "Şampiyon", "Hayalet", "Fırtına", "Piton"];
 
         let inMenuMode = true; 
@@ -663,15 +711,36 @@
         }
 
         function spawnSnake(id, name, isBot = false, skin = null, pattern = null, isMenuBot = false) {
-            let startX = isMenuBot ? WORLD_SIZE/2 + (Math.random()-0.5)*1500 : Math.random() * (WORLD_SIZE - 400) + 200;
-            let startY = isMenuBot ? WORLD_SIZE/2 + (Math.random()-0.5)*1500 : Math.random() * (WORLD_SIZE - 400) + 200;
-            let initialPowerups = { magnet: 0, ghost: 0, x2: 0 };
-            if (!isBot && currentGameMode === 'overpowered') initialPowerups = { magnet: 10, ghost: 10, x2: 10 };
+            let startX, startY;
+            let safeSpawn = false;
+            let attempts = 0;
+            
+            while (!safeSpawn && attempts < 50) {
+                startX = isMenuBot ? WORLD_SIZE/2 + (Math.random()-0.5)*1500 : Math.random() * (WORLD_SIZE - 400) + 200;
+                startY = isMenuBot ? WORLD_SIZE/2 + (Math.random()-0.5)*1500 : Math.random() * (WORLD_SIZE - 400) + 200;
+                
+                safeSpawn = true;
+                if (!isMenuBot && gameState && gameState.snakes) {
+                    for (let otherId in gameState.snakes) {
+                        let other = gameState.snakes[otherId];
+                        let safeDist = (!other.isBot) ? 1000 : 300; 
+                        if (Math.hypot(startX - other.x, startY - other.y) < safeDist) {
+                            safeSpawn = false;
+                            break;
+                        }
+                    }
+                }
+                attempts++;
+            }
+
+            let initialPowerups = { magnet: 0, ghost: 0, x2: 0, shield: 0 };
+            if (!isBot && currentGameMode === 'overpowered') initialPowerups = { magnet: 10, ghost: 10, x2: 10, shield: 10 };
 
             gameState.snakes[id] = {
                 id: id, name: name || "İsimsiz", x: startX, y: startY, angle: Math.random() * Math.PI * 2, 
                 body: [], color: randomColor(), size: 12, length: 15, isBot: isBot, 
-                skin: skin, pattern: pattern, isBoosting: false, activePowerups: initialPowerups
+                skin: skin, pattern: pattern, isBoosting: false, activePowerups: initialPowerups,
+                combo: 0, comboTimer: 0
             };
         }
 
@@ -827,6 +896,8 @@
                         drawGame(me ? me.x : WORLD_SIZE/2, me ? me.y : WORLD_SIZE/2, true);
                     } else if (data.type === 'playSound') {
                         if (!inMenuMode) playExplosionSound();
+                    } else if (data.type === 'combo') {
+                        showComboText(data.count);
                     }
                 });
             });
@@ -838,10 +909,31 @@
             else serverConn.send({ type: 'join', name: myName, skin: mySkin, pattern: myPattern });
         }
 
+        function showDeathScreen(score) {
+            document.getElementById('death-screen').style.display = 'flex';
+            ['magnet', 'ghost', 'x2', 'shield'].forEach(t => {
+                let el = document.getElementById('pu-'+t);
+                if(el) el.style.display = 'none';
+            });
+            let earned = Math.floor((score || 0) / 10);
+            let finalScoreEl = document.getElementById('final-score-text');
+            if(finalScoreEl) finalScoreEl.innerText = Math.floor(score || 0);
+            let earnedEl = document.getElementById('earned-money-text');
+            if(earnedEl) earnedEl.innerText = earned;
+            
+            userMoney += earned;
+            localStorage.setItem('yilanss_money', userMoney);
+            document.getElementById('total-money').innerText = userMoney;
+        }
+
+        let lastKnownScore = 0;
         function checkMyDeath() {
             if (!isHost && myId && !gameState.snakes[myId]) {
-                document.getElementById('death-screen').style.display = 'flex';
-                ['magnet', 'ghost', 'x2'].forEach(t => document.getElementById('pu-'+t).style.display = 'none');
+                if (document.getElementById('death-screen').style.display !== 'flex') {
+                    showDeathScreen(lastKnownScore);
+                }
+            } else if (myId && gameState.snakes[myId]) {
+                lastKnownScore = gameState.snakes[myId].length;
             }
         }
 
@@ -863,6 +955,18 @@
                 }
             }
 
+            if (killerId && gameState.snakes[killerId]) {
+                let killer = gameState.snakes[killerId];
+                killer.combo = (killer.combo || 0) + 1;
+                killer.comboTimer = 5;
+                if (killerId === myId) {
+                    showComboText(killer.combo);
+                } else {
+                    let conn = connections.find(c => c.peer === killerId);
+                    if (conn && conn.open) conn.send({ type: 'combo', count: killer.combo });
+                }
+            }
+
             snake.body.forEach((segment, index) => {
                 if (index % 3 === 0) spawnFood(segment.x, segment.y, Math.min(snake.size * 1.2, 22), snake.color);
             });
@@ -881,8 +985,7 @@
             delete gameState.snakes[id];
 
             if (id === myId) {
-                document.getElementById('death-screen').style.display = 'flex';
-                ['magnet', 'ghost', 'x2'].forEach(t => document.getElementById('pu-'+t).style.display = 'none');
+                showDeathScreen(snake.length);
             }
             else if (snake.isBot && !inMenuMode) {
                 setTimeout(() => {
@@ -936,6 +1039,11 @@
                         snake.activePowerups[type] -= dtSeconds;
                         if (snake.activePowerups[type] <= 0) snake.activePowerups[type] = 0;
                     }
+                }
+
+                if (snake.comboTimer > 0) {
+                    snake.comboTimer -= dtSeconds;
+                    if (snake.comboTimer <= 0) snake.combo = 0;
                 }
 
                 if (snake.activePowerups['magnet'] > 0) {
@@ -1037,22 +1145,49 @@
                 }
 
                 snake.x += Math.cos(snake.angle) * currentSpeed; snake.y -= Math.sin(snake.angle) * currentSpeed; 
-                if (snake.x < 0 || snake.x > WORLD_SIZE || snake.y < 0 || snake.y > WORLD_SIZE) { killSnake(id, null); continue; }
+                
+                if (snake.x < 0 || snake.x > WORLD_SIZE || snake.y < 0 || snake.y > WORLD_SIZE) { 
+                    if (snake.activePowerups['shield'] > 0) {
+                        snake.activePowerups['shield'] = 0;
+                        snake.angle += Math.PI; 
+                        snake.x = Math.max(10, Math.min(WORLD_SIZE - 10, snake.x));
+                        snake.y = Math.max(10, Math.min(WORLD_SIZE - 10, snake.y));
+                        snake.activePowerups['ghost'] = 2;
+                    } else {
+                        killSnake(id, null); continue; 
+                    }
+                }
 
                 let died = false; let killerId = null;
                 if (snake.activePowerups['ghost'] <= 0) {
+                    let tipX = snake.x + Math.cos(snake.angle) * (snake.size * 0.7);
+                    let tipY = snake.y - Math.sin(snake.angle) * (snake.size * 0.7);
+
                     for (let otherId in gameState.snakes) {
                         if (id === otherId) continue;
                         let other = gameState.snakes[otherId];
                         if (other.activePowerups && other.activePowerups['ghost'] > 0) continue; 
                         for (let i = 0; i < other.body.length; i += 3) {
                             let segment = other.body[i];
-                            if (Math.hypot(snake.x - segment.x, snake.y - segment.y) < snake.size + (other.size * 0.8)) { died = true; killerId = otherId; break; }
+                            let segmentRadius = other.size * (1 - (i / other.body.length) * 0.4);
+                            if (Math.hypot(tipX - segment.x, tipY - segment.y) < segmentRadius * 0.9) { 
+                                died = true; killerId = otherId; break; 
+                            }
                         }
                         if(died) break;
                     }
                 }
-                if (died) { killSnake(id, killerId); continue; } 
+                
+                if (died) { 
+                    if (snake.activePowerups['shield'] > 0) {
+                        snake.activePowerups['shield'] = 0;
+                        snake.activePowerups['ghost'] = 2;
+                        snake.x -= Math.cos(snake.angle) * snake.size * 5;
+                        snake.y += Math.sin(snake.angle) * snake.size * 5;
+                    } else {
+                        killSnake(id, killerId); continue; 
+                    }
+                } 
 
                 let multiplier = (snake.activePowerups['x2'] > 0) ? 2 : 1;
                 for (let i = gameState.food.length - 1; i >= 0; i--) {
@@ -1090,7 +1225,7 @@
             ctx.strokeStyle = 'rgba(255, 71, 87, 0.2)'; ctx.lineWidth = 15; ctx.strokeRect(0, 0, WORLD_SIZE, WORLD_SIZE);
             ctx.strokeStyle = '#ff4757'; ctx.lineWidth = 4; ctx.strokeRect(0, 0, WORLD_SIZE, WORLD_SIZE);
 
-            // OPTİMİZASYON: Sadece ekranda olan Yemleri Çiz (Gereksiz animasyonlar silindi)
+            // OPTİMİZASYON: Sadece ekranda olan Yemleri Çiz
             gameState.food.forEach(f => {
                 if(f.x > camX - 20 && f.x < camX + width + 20 && f.y > camY - 20 && f.y < camY + height + 20) {
                     let imgToDraw = foodCache[f.color] || foodCache['#ffffff'];
@@ -1106,13 +1241,14 @@
                         
                         let floatY = Math.sin(globalTime * 3) * 5; ctx.translate(0, floatY);
 
-                        ctx.fillStyle = p.type === 'magnet' ? 'rgba(52, 152, 219, 0.4)' : (p.type === 'ghost' ? 'rgba(236, 240, 241, 0.4)' : 'rgba(241, 196, 15, 0.4)');
+                        ctx.fillStyle = p.type === 'magnet' ? 'rgba(52, 152, 219, 0.4)' : (p.type === 'ghost' ? 'rgba(236, 240, 241, 0.4)' : (p.type === 'shield' ? 'rgba(46, 204, 113, 0.4)' : 'rgba(241, 196, 15, 0.4)'));
                         ctx.beginPath(); ctx.arc(0, 0, p.size * 1.5, 0, Math.PI*2); ctx.fill();
 
                         let pGrad = ctx.createRadialGradient(-p.size/3, -p.size/3, 0, 0, 0, p.size);
                         pGrad.addColorStop(0, '#ffffff');
                         if(p.type === 'magnet') { pGrad.addColorStop(0.3, '#3498db'); pGrad.addColorStop(1, '#2980b9'); }
                         else if(p.type === 'ghost') { pGrad.addColorStop(0.3, '#ecf0f1'); pGrad.addColorStop(1, '#bdc3c7'); }
+                        else if(p.type === 'shield') { pGrad.addColorStop(0.3, '#2ecc71'); pGrad.addColorStop(1, '#27ae60'); }
                         else if(p.type === 'x2') { pGrad.addColorStop(0.3, '#f1c40f'); pGrad.addColorStop(1, '#f39c12'); }
                         
                         ctx.fillStyle = pGrad; ctx.beginPath(); ctx.arc(0, 0, p.size, 0, Math.PI*2); ctx.fill();
@@ -1121,6 +1257,7 @@
                         ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.font = 'bold 18px Arial';
                         if(p.type === 'magnet') ctx.fillText('🧲', 0, 1);
                         else if(p.type === 'ghost') ctx.fillText('👻', 0, 1);
+                        else if(p.type === 'shield') ctx.fillText('🛡️', 0, 1);
                         else if(p.type === 'x2') ctx.fillText('2X', 0, 1);
                         
                         ctx.restore();
@@ -1151,7 +1288,7 @@
             for (let id in gameState.snakes) {
                 let snake = gameState.snakes[id];
                 
-                // Kamera Dışındaki Yılanları Ekrana Çizme (FPS'i Kurtaran Hamle)
+                // Kamera Dışındaki Yılanları Ekrana Çizme
                 if (snake.x < camX - snakeMargin || snake.x > camX + width + snakeMargin ||
                     snake.y < camY - snakeMargin || snake.y > camY + height + snakeMargin) {
                     continue;
@@ -1161,7 +1298,28 @@
 
                 if (snake.activePowerups && snake.activePowerups['ghost'] > 0) ctx.globalAlpha = 0.4;
 
-                // Gövdeleri çiz (Adım aralığı artırıldı, cache'lenmiş resim basılıyor)
+                // HIZ ÇİZGİLERİ (Speed Trails)
+                if (snake.isBoosting && snake.length > 12) {
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+                    ctx.lineWidth = 2;
+                    for(let k=0; k<2; k++) {
+                        ctx.beginPath();
+                        let offset = (k === 0 ? -1 : 1) * (snake.size * 0.8);
+                        let offsetX = Math.cos(snake.angle + Math.PI/2) * offset;
+                        let offsetY = -Math.sin(snake.angle + Math.PI/2) * offset;
+                        
+                        let startX = snake.x + offsetX - Math.cos(snake.angle)* (snake.size * 1.5);
+                        let startY = snake.y + offsetY + Math.sin(snake.angle)* (snake.size * 1.5);
+                        let endX = startX - Math.cos(snake.angle) * (snake.size * 3);
+                        let endY = startY + Math.sin(snake.angle) * (snake.size * 3);
+                        
+                        ctx.moveTo(startX, startY);
+                        ctx.lineTo(endX, endY);
+                        ctx.stroke();
+                    }
+                }
+
+                // Gövdeleri çiz
                 for (let i = snake.body.length - 1; i >= 0; i -= 3) { 
                     let segment = snake.body[i]; 
                     let segColor = currentP ? currentP[Math.floor(i / 3) % currentP.length] : snake.color;
@@ -1170,7 +1328,7 @@
 
                     let cachedSegment = segmentCache[segColor];
                     if(cachedSegment) {
-                        let drawSize = radius * 2.5; // Bake oranını (r*0.8) telafi eden çarpan
+                        let drawSize = radius * 2.5; 
                         ctx.drawImage(cachedSegment, segment.x - drawSize/2, segment.y - drawSize/2, drawSize, drawSize);
                     }
                 }
@@ -1210,12 +1368,24 @@
                     ctx.beginPath(); ctx.arc(snake.x + ex + Math.cos(snake.angle)*2, snake.y + ey - Math.sin(snake.angle)*2, snake.size * 0.18, 0, Math.PI * 2); ctx.fill();
                     ctx.beginPath(); ctx.arc(snake.x + ex2 + Math.cos(snake.angle)*2, snake.y + ey2 - Math.sin(snake.angle)*2, snake.size * 0.18, 0, Math.PI * 2); ctx.fill();
                 }
+
+                // KALKAN GÖRSELİ ÇİZİMİ
+                if (snake.activePowerups && snake.activePowerups['shield'] > 0) {
+                    ctx.strokeStyle = 'rgba(46, 204, 113, 0.6)';
+                    ctx.lineWidth = Math.max(2, snake.size * 0.1);
+                    ctx.beginPath();
+                    ctx.arc(snake.x, snake.y, snake.size * 1.8 + Math.sin(globalTime*10)*2, 0, Math.PI*2);
+                    ctx.stroke();
+                    ctx.fillStyle = 'rgba(46, 204, 113, 0.15)';
+                    ctx.fill();
+                }
                 
                 if (snake.activePowerups) {
                     let activeIcons = [];
                     if (snake.activePowerups['magnet'] > 0) activeIcons.push('🧲');
                     if (snake.activePowerups['ghost'] > 0) activeIcons.push('👻');
                     if (snake.activePowerups['x2'] > 0) activeIcons.push('⭐');
+                    if (snake.activePowerups['shield'] > 0) activeIcons.push('🛡️');
                     
                     if (activeIcons.length > 0) {
                         ctx.font = "18px Arial"; ctx.textAlign = "center";
@@ -1238,8 +1408,9 @@
             if (showUI) {
                 let me = gameState.snakes[myId];
                 if (me && me.activePowerups) {
-                    ['magnet', 'ghost', 'x2'].forEach(type => {
+                    ['magnet', 'ghost', 'x2', 'shield'].forEach(type => {
                         let el = document.getElementById('pu-' + type);
+                        if(!el) return;
                         let timeSpan = el.querySelector('.pu-time');
                         let timeLeft = me.activePowerups[type];
                         if (timeLeft > 0) {

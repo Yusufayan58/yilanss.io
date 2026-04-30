@@ -121,8 +121,16 @@
         .grid-item .placeholder { width: 60px; height: 60px; background: #222; border-radius: 50%; display:flex; justify-content:center; align-items:center; font-size:12px; }
         .grid-item span { font-size: 13px; font-weight: bold; color: #ddd; text-align: center; }
 
-        #bottom-right-ui { bottom: 30px; right: 30px; display: flex; flex-direction: column; align-items: flex-end; gap: 15px; }
+        #bottom-right-ui { bottom: 30px; right: 30px; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
         
+        .game-select-style {
+            background: rgba(0,0,0,0.8); color: white; border: 2px solid rgba(255,255,255,0.3);
+            padding: 12px 15px; border-radius: 15px; font-weight: bold; font-size: 15px;
+            outline: none; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            transition: 0.2s; width: 100%;
+        }
+        .game-select-style:hover { border-color: #f39c12; box-shadow: 0 0 15px rgba(243, 156, 18, 0.5); }
+
         #bottom-left-ui { bottom: 30px; left: 30px; display: flex; flex-direction: column; align-items: flex-start; }
         #settings-btn {
             background: rgba(0,0,0,0.8); color: white; border: 2px solid rgba(255,255,255,0.3);
@@ -141,7 +149,8 @@
         }
         .settings-content h2 { margin-top: 0; color: #3498db; font-size: 28px; text-shadow: 0 0 10px rgba(52,152,219,0.5); }
         .setting-row { margin: 25px 0; font-size: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; }
-        .setting-row input { width: 22px; height: 22px; cursor: pointer; }
+        .setting-row input[type="checkbox"] { width: 22px; height: 22px; cursor: pointer; }
+        .setting-row select { font-size: 18px; padding: 5px 10px; border-radius: 10px; background: rgba(0,0,0,0.6); color: white; border: 1px solid #3498db; cursor: pointer; outline: none; }
 
         #host-lobby-modal {
             display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -162,18 +171,10 @@
         }
         #lobby-copy-btn:hover { transform: scale(1.05); box-shadow: 0 5px 20px rgba(52, 152, 219, 0.8); }
 
-        #gameModeSelect {
-            background: rgba(0,0,0,0.8); color: white; border: 2px solid rgba(255,255,255,0.3);
-            padding: 12px 15px; border-radius: 15px; font-weight: bold; font-size: 15px;
-            outline: none; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            transition: 0.2s;
-        }
-        #gameModeSelect:hover { border-color: #f39c12; box-shadow: 0 0 15px rgba(243, 156, 18, 0.5); }
-
-        .room-group { display: flex; gap: 10px; align-items: center; }
+        .room-group { display: flex; gap: 10px; align-items: center; width: 100%; }
         #hostIdInput {
             padding: 12px 15px; border-radius: 10px; border: none; background: rgba(255,255,255,0.95);
-            font-weight: bold; width: 140px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            font-weight: bold; width: 140px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); flex-grow: 1;
         }
         .btn-join {
             background: linear-gradient(135deg, #f39c12, #d35400); color: white; border: none;
@@ -184,7 +185,7 @@
 
         .btn-start {
             background: linear-gradient(135deg, #2ecc71, #27ae60); color: white; border: none;
-            padding: 20px 50px; border-radius: 30px; font-size: 28px; font-weight: bold; cursor: pointer;
+            padding: 20px 50px; border-radius: 30px; font-size: 28px; font-weight: bold; cursor: pointer; width: 100%;
             box-shadow: 0 8px 25px rgba(46, 204, 113, 0.5); transition: 0.2s; animation: pulseStart 2s infinite;
         }
         .btn-start:hover { transform: scale(1.05); background: linear-gradient(135deg, #27ae60, #1e8449); }
@@ -287,12 +288,12 @@
             .selection-name { font-size: 10px; padding: 4px; border-radius: 8px; }
             .btn-select { padding: 5px 8px; font-size: 11px; border-radius: 8px; }
 
-            #bottom-right-ui { bottom: 10px; right: 10px; gap: 8px; transform: scale(0.9); transform-origin: bottom right; }
-            #gameModeSelect { padding: 6px 8px; font-size: 11px; }
+            #bottom-right-ui { bottom: 10px; right: 10px; gap: 8px; transform: scale(0.9); transform-origin: bottom right; width: 160px;}
+            .game-select-style { padding: 6px 8px; font-size: 11px; }
             .room-group { gap: 5px; }
             #hostIdInput { width: 80px; padding: 6px; font-size: 11px; }
             .btn-join { padding: 6px 10px; font-size: 11px; }
-            .btn-start { padding: 12px 25px; font-size: 18px; border-radius: 20px;}
+            .btn-start { padding: 10px 20px; font-size: 16px; border-radius: 20px;}
 
             #boost-btn { bottom: 15px; right: 15px; width: 60px; height: 60px; font-size: 10px; border-width: 2px;}
             .pu-box { padding: 4px 8px; font-size: 12px; gap: 4px; }
@@ -357,14 +358,20 @@
         </div>
 
         <div id="bottom-right-ui" class="menu-element">
-            <select id="gameModeSelect">
-                <option value="classic">🟢 Klasik (Güçler Haritada Çıkar)</option>
-                <option value="overpowered">🔥 Güçlü Başlangıç (10s Tüm Güçlerle Başla)</option>
+            <select id="botDifficultySelect" class="game-select-style">
+                <option value="easy">🤖 Bot Zorluğu: Kolay</option>
+                <option value="normal" selected>🤖 Bot Zorluğu: Normal</option>
+                <option value="hard">🤖 Bot Zorluğu: Zor</option>
+            </select>
+
+            <select id="gameModeSelect" class="game-select-style">
+                <option value="classic">🟢 Mod: Klasik</option>
+                <option value="overpowered">🔥 Mod: Güçlü Başlangıç</option>
             </select>
 
             <div class="room-group">
-                <input type="text" id="hostIdInput" placeholder="Oda ID Gir">
-                <button class="btn-join" onclick="joinGame()">Odaya Katıl</button>
+                <input type="text" id="hostIdInput" placeholder="Oda ID">
+                <button class="btn-join" onclick="joinGame()">Katıl</button>
             </div>
             <button class="btn-start" onclick="hostRoom()">ODA KUR</button>
         </div>
@@ -385,8 +392,16 @@
                 <input type="checkbox" id="soundToggle" checked onchange="toggleSound()">
                 🔊 Ses Efektleri (Patlama)
             </label>
+            <label class="setting-row">
+                🖥️ Grafik: 
+                <select id="graphicsSelect" onchange="changeGraphics()">
+                    <option value="low">Düşük</option>
+                    <option value="medium">Orta</option>
+                    <option value="high" selected>Yüksek</option>
+                </select>
+            </label>
             <br>
-            <button class="menu-btn-small" style="width: 150px; margin-top: 10px;" onclick="closeSettings()">Kapat</button>
+            <button class="menu-btn-small" style="width: 150px; margin-top: 10px;" onclick="closeSettings()">Kaydet & Kapat</button>
         </div>
     </div>
 
@@ -433,10 +448,41 @@
     </div>
 
     <script>
+        // --- GRAFİK AYARLARI ---
+        let graphicsQuality = localStorage.getItem('yilanss_graphics') || 'high';
+        let MAX_FOOD = 500;
+        let FPS = 60;
+        let fpsInterval = 1000 / FPS;
+
+        function applyGraphicsSettings() {
+            if (graphicsQuality === 'low') { MAX_FOOD = 150; }
+            else if (graphicsQuality === 'medium') { MAX_FOOD = 300; }
+            else { MAX_FOOD = 500; }
+            fpsInterval = 1000 / FPS;
+        }
+
+        function changeGraphics() {
+            graphicsQuality = document.getElementById('graphicsSelect').value;
+            localStorage.setItem('yilanss_graphics', graphicsQuality);
+            applyGraphicsSettings();
+        }
+
+        // --- BOT ZORLUK AYARLARI (GÜNCELLENDİ) ---
+        let currentBotDifficulty = 'normal';
+        const botDiffConfigs = {
+            'easy': { frameCheck: 15, foodChecks: 20, viewDistSq: 160000, attackDistSq: 22500, aggression: 0.2 }, 
+            'normal': { frameCheck: 8, foodChecks: 50, viewDistSq: 360000, attackDistSq: 40000, aggression: 0.7 }, 
+            'hard': { frameCheck: 2, foodChecks: 150, viewDistSq: 1000000, attackDistSq: 250000, aggression: 1.0 } // İnanılmaz agresif ve uzağı görür
+        };
+
         let userMoney = parseInt(localStorage.getItem('yilanss_money')) || 0;
         document.addEventListener("DOMContentLoaded", () => {
             let el = document.getElementById('total-money');
             if(el) el.innerText = userMoney;
+            
+            let gSelect = document.getElementById('graphicsSelect');
+            if(gSelect) gSelect.value = graphicsQuality;
+            applyGraphicsSettings();
         });
 
         const canvas = document.getElementById('gameCanvas');
@@ -454,6 +500,13 @@
             if (!document.fullscreenElement) {
                 if (el.requestFullscreen) { el.requestFullscreen(); } 
                 else if (el.webkitRequestFullscreen) { el.webkitRequestFullscreen(); }
+            }
+            
+            // Ekranı yatay (landscape) modda kilitlemeye zorla
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('landscape').catch(function(error) {
+                    console.log("Ekran döndürme kilitlenemedi: ", error);
+                });
             }
         }
 
@@ -560,7 +613,6 @@
         }
 
         function initCaches() {
-            // Yem Cache
             baseColors.forEach(color => {
                 let oc = document.createElement('canvas');
                 let r = 20; 
@@ -577,7 +629,6 @@
                 foodCache[color] = oc;
             });
 
-            // Segment Cache
             let allColors = new Set([...baseColors]);
             for(let key in bodyPatterns) { bodyPatterns[key].forEach(c => allColors.add(c)); }
             
@@ -597,7 +648,6 @@
                 segmentCache[color] = oc;
             });
 
-            // Güçlendirme (Powerup) Cache
             ['magnet', 'ghost', 'x2', 'shield'].forEach(type => {
                 let oc = document.createElement('canvas');
                 let size = 20; let totalSize = size * 1.5;
@@ -801,10 +851,7 @@
 
         const WORLD_SIZE = 4000;
         const SNAKE_SPEED = 3.5; 
-        const MAX_BOTS = 40; 
-        const MAX_FOOD = 500;    
-        const FPS = 60;
-        const fpsInterval = 1000 / FPS;
+        const MAX_BOTS = 40;     
         let lastRenderTime = performance.now();
 
         let myAngle = 0; let myBoost = false; let joystickManager = null;
@@ -849,7 +896,7 @@
                 id: id, name: name || "İsimsiz", x: startX, y: startY, angle: Math.random() * Math.PI * 2, 
                 body: [], color: baseColors[Math.floor(Math.random() * (baseColors.length - 1))], size: 12, length: 15, isBot: isBot, 
                 skin: skin, pattern: pattern, isBoosting: false, activePowerups: initialPowerups,
-                combo: 0, comboTimer: 0, aiOffset: Math.floor(Math.random() * 10) 
+                combo: 0, comboTimer: 0, aiOffset: Math.floor(Math.random() * 15) 
             };
         }
 
@@ -873,7 +920,7 @@
             document.getElementById('loading-screen').style.display = 'none';
             document.getElementById('main-menu').style.display = 'flex';
             updateMenus(); animatePatternPreview();
-            for(let i=0; i<MAX_FOOD; i++) spawnFood();
+            for(let i=0; i<300; i++) spawnFood(); // Menü için fix değer
             for(let i=0; i<30; i++) {
                 let p = Math.random() > 0.2 ? patternKeys[Math.floor(Math.random() * patternKeys.length)] : null;
                 spawnSnake("menuBot_" + i, botNames[Math.floor(Math.random() * botNames.length)], true, null, p, true);
@@ -930,6 +977,7 @@
             initAudio(); 
             myName = getPlayerName();
             currentGameMode = document.getElementById('gameModeSelect').value; 
+            currentBotDifficulty = document.getElementById('botDifficultySelect').value;
             
             document.getElementById('main-menu').style.display = 'none';
             document.getElementById('loading-screen').style.display = 'flex';
@@ -1079,7 +1127,8 @@
             if(!gameState.particles) gameState.particles = [];
             gameState.particles.push({ type: 'text', text: snake.name + " Patladı!", x: snake.x, y: snake.y, vx: 0, vy: -2, life: 1.5, color: '#ff4757' });
 
-            for(let i=0; i<30; i++) {
+            let particleCount = graphicsQuality === 'low' ? 5 : (graphicsQuality === 'medium' ? 15 : 30);
+            for(let i=0; i<particleCount; i++) {
                 let speed = Math.random() * 8 + 2; let ang = Math.random() * Math.PI * 2;
                 gameState.particles.push({
                     type: 'dot', x: snake.x, y: snake.y, vx: Math.cos(ang) * speed, vy: Math.sin(ang) * speed,
@@ -1138,6 +1187,9 @@
             gameState.leaderboard = allSnakes.slice(0, 10).map(s => ({ name: s.name, score: Math.max(0, Math.floor((s.length - 15) * 10)) }));
             gameState.rankings = allSnakes.map(s => s.id);
 
+            // BOT ZORLUK AYARLARI ÇEKİLİYOR
+            let diffConfig = botDiffConfigs[currentBotDifficulty] || botDiffConfigs['normal'];
+
             for (let id in gameState.snakes) {
                 let snake = gameState.snakes[id];
                 
@@ -1155,10 +1207,9 @@
 
                 if (snake.activePowerups['magnet'] > 0) {
                     for(let f of gameState.food) {
-                        // KARESEL MESAFE HESABI İLE MIKNATIS OPTİMİZASYONU
                         let dx = snake.x - f.x; let dy = snake.y - f.y;
-                        if ((dx*dx + dy*dy) < 90000) { // 300^2
-                            let ang = Math.atan2(dy, dx); // DÜZELTME: Eksi işaretler kaldırıldı, yemler merkeze çekilecek
+                        if ((dx*dx + dy*dy) < 90000) { 
+                            let ang = Math.atan2(dy, dx); 
                             f.x += Math.cos(ang) * 10; f.y += Math.sin(ang) * 10;
                         }
                     }
@@ -1173,7 +1224,8 @@
                     }
                 }
                 
-                if (snake.isBot && ((frameCount + (snake.aiOffset || 0)) % 8 === 0)) {
+                // ZORLUĞA GÖRE DİNAMİK BOT ZEKA DÖNGÜSÜ
+                if (snake.isBot && ((frameCount + (snake.aiOffset || 0)) % diffConfig.frameCheck === 0)) {
                     let isDanger = false; let bestAngle = snake.angle;
                     
                     function checkDanger(angleOffset, distance) {
@@ -1187,7 +1239,7 @@
                             if (other.activePowerups && other.activePowerups['ghost'] > 0) continue; 
                             
                             let dx = other.x - snake.x; let dy = other.y - snake.y;
-                            if ((dx*dx + dy*dy) > 360000) continue; 
+                            if ((dx*dx + dy*dy) > diffConfig.viewDistSq) continue; 
                             
                             for (let i = 0; i < other.body.length; i += 3) {
                                 let segment = other.body[i];
@@ -1208,7 +1260,7 @@
                         }
                     }
 
-                    let closestEnemy = null; let enemyDistSq = 202500; 
+                    let closestEnemy = null; let enemyDistSq = diffConfig.viewDistSq; 
                     let bestFood = null; let foodScore = -1; let bestPu = null; let puScore = -1;
 
                     if (!isDanger) {
@@ -1217,7 +1269,7 @@
                         for (let p of gameState.powerups) {
                             let dx = p.x - snake.x; let dy = p.y - snake.y;
                             let distSq = dx*dx + dy*dy;
-                            if (distSq < 360000) { 
+                            if (distSq < diffConfig.viewDistSq) { 
                                 let score = 5000 / (Math.sqrt(distSq) + 1); 
                                 if (score > puScore) { puScore = score; bestPu = p; } 
                             }
@@ -1232,34 +1284,37 @@
                             if (distSq < enemyDistSq) { enemyDistSq = distSq; closestEnemy = other; }
                         }
 
-                        let foodChecks = Math.min(50, gameState.food.length);
+                        let foodChecks = Math.min(diffConfig.foodChecks, gameState.food.length);
                         for (let i=0; i<foodChecks; i++) {
                             let f = gameState.food[Math.floor(Math.random() * gameState.food.length)];
                             let dx = f.x - snake.x; let dy = f.y - snake.y;
                             let distSq = dx*dx + dy*dy;
-                            if (distSq < 640000) { 
+                            if (distSq < diffConfig.viewDistSq * 1.5) { 
                                 let score = (f.size * f.size * f.size) / (Math.sqrt(distSq) + 1);
                                 if (score > foodScore) { foodScore = score; bestFood = f; }
                             }
                         }
 
+                        // GÜNCELLENMİŞ ZOR MOD DÜŞMAN TAKİBİ
                         if (bestPu && puScore > foodScore) { targetX = bestPu.x; targetY = bestPu.y; }
                         else if (bestFood && bestFood.size > 10 && foodScore > 5) { targetX = bestFood.x; targetY = bestFood.y; } 
-                        else if (closestEnemy && enemyDistSq < 122500 && (snake.activePowerups['ghost'] <= 0)) { 
-                            targetX = closestEnemy.x + Math.cos(closestEnemy.angle) * 120; targetY = closestEnemy.y - Math.sin(closestEnemy.angle) * 120; 
+                        else if (closestEnemy && enemyDistSq < diffConfig.attackDistSq && (snake.activePowerups['ghost'] <= 0)) { 
+                            targetX = closestEnemy.x + Math.cos(closestEnemy.angle) * 100; targetY = closestEnemy.y - Math.sin(closestEnemy.angle) * 100; 
                         } else if (bestFood) { targetX = bestFood.x; targetY = bestFood.y; }
 
                         if (targetX !== null && targetY !== null) {
                             let angleToTarget = Math.atan2(snake.y - targetY, targetX - snake.x);
                             let diff = angleToTarget - snake.angle;
                             while (diff > Math.PI) diff -= Math.PI * 2; while (diff < -Math.PI) diff += Math.PI * 2;
-                            bestAngle += diff * 0.08; 
+                            // ZOR MODDA ÇOK DAHA KESKİN DÖNÜŞ YAPAR
+                            let turnSpeed = currentBotDifficulty === 'hard' ? 0.15 : 0.08;
+                            bestAngle += diff * turnSpeed; 
                         } else { 
                             if (Math.random() < 0.1) bestAngle += (Math.random() - 0.5) * 0.5; 
                         }
                     }
                     snake.targetAngle = bestAngle;
-                    if ((isDanger || (closestEnemy && enemyDistSq < 40000)) && snake.length > 20) snake.isBoosting = (Math.random() < 0.7); 
+                    if ((isDanger || (closestEnemy && enemyDistSq < diffConfig.attackDistSq)) && snake.length > 20) snake.isBoosting = (Math.random() < diffConfig.aggression); 
                     else snake.isBoosting = false;
                 }
 
@@ -1354,7 +1409,7 @@
             let camY = Math.floor(targetY - height / 2);
             ctx.save(); ctx.translate(-camX, -camY);
 
-            if (hexBackgroundPattern) {
+            if (hexBackgroundPattern && graphicsQuality !== 'low') {
                 ctx.fillStyle = hexBackgroundPattern;
                 ctx.fillRect(camX, camY, width, height); 
             }
@@ -1445,35 +1500,39 @@
 
                 let isHeadDrawn = false;
                 
-                // DÜZELTME: Mobilde resim hafızadan silindiyse dinamik olarak anında geri oluştur
+                // KAFA BUGU İÇİN YENİ GÜVENLİ ÇİZİM MANTIĞI
                 if (snake.skin) {
                     let img = skinImages[snake.skin];
-                    if (!img || img.naturalWidth === 0) {
-                        img = new Image();
-                        img.src = snake.skin + '.png';
-                        skinImages[snake.skin] = img; // Önbelleği güncelle
-                    }
-                    
-                    if (img.naturalWidth > 0) { 
+                    // Resim yoksa, eksikse veya tam yüklenmediyse yeniden yüklemeyi dener.
+                    if (!img || !img.complete || img.naturalWidth === 0) {
+                        if (!img || img.error) {
+                            img = new Image();
+                            img.src = snake.skin + '.png';
+                            img.error = false;
+                            img.onerror = function() { this.error = true; };
+                            skinImages[snake.skin] = img; 
+                        }
+                    } else {
+                        // SADECE RESİM KUSURSUZ YÜKLENDİYSE ÇİZER (SİYAH YUVARLAK KALDIRILDI)
                         ctx.save(); ctx.translate(Math.floor(snake.x), Math.floor(snake.y)); ctx.rotate(Math.PI / 2 - snake.angle); 
                         let r = snake.size * 1.5; 
-                        
-                        ctx.fillStyle = 'rgba(0,0,0,0.4)';
-                        ctx.beginPath(); ctx.arc(0, 0, r*0.8, 0, Math.PI*2); ctx.fill();
-                        
                         ctx.drawImage(img, Math.floor(-r), Math.floor(-r), Math.floor(r * 2), Math.floor(r * 2)); 
-                        ctx.restore(); isHeadDrawn = true;
+                        ctx.restore(); 
+                        isHeadDrawn = true;
                     }
                 }
                 
+                // RESİM YÜKLENEMEDİYSE VEYA HALA BEKLİYORSA OYUNUN KENDİ KAFASINI ÇİZER
                 if (!isHeadDrawn) {
                     let headColor = currentP ? currentP[0] : snake.color;
                     ctx.fillStyle = headColor;
                     ctx.beginPath(); ctx.arc(Math.floor(snake.x), Math.floor(snake.y), snake.size, 0, Math.PI * 2); ctx.fill();
                     ctx.strokeStyle = darkenColor(headColor, -20); ctx.lineWidth = snake.size * 0.15; ctx.stroke();
                     
-                    ctx.fillStyle = 'rgba(255,255,255,0.3)';
-                    ctx.beginPath(); ctx.arc(Math.floor(snake.x - snake.size*0.3), Math.floor(snake.y - snake.size*0.3), snake.size*0.4, 0, Math.PI * 2); ctx.fill();
+                    if (graphicsQuality !== 'low') {
+                        ctx.fillStyle = 'rgba(255,255,255,0.3)';
+                        ctx.beginPath(); ctx.arc(Math.floor(snake.x - snake.size*0.3), Math.floor(snake.y - snake.size*0.3), snake.size*0.4, 0, Math.PI * 2); ctx.fill();
+                    }
 
                     ctx.fillStyle = "white";
                     let ex = Math.cos(snake.angle + Math.PI/4) * (snake.size * 0.5); let ey = -Math.sin(snake.angle + Math.PI/4) * (snake.size * 0.5);
@@ -1512,7 +1571,7 @@
 
                 ctx.globalAlpha = 1.0; 
 
-                if(showUI) {
+                if(showUI && graphicsQuality !== 'low') {
                     ctx.font = "bold 15px 'Segoe UI', Arial"; ctx.textAlign = "center";
                     let displayName = id === myId ? "Sen (" + snake.name + ")" : snake.name;
                     ctx.fillStyle = "rgba(0,0,0,0.6)"; ctx.fillText(displayName, Math.floor(snake.x + 1), Math.floor(snake.y - snake.size - 9)); 
